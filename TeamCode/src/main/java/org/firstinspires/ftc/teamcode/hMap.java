@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class hMap {
     //Declare motors
-    private DcMotor motorLeft;
-    private DcMotor motorRight;
+    public DcMotor motorLeft;
+    public DcMotor motorRight;
 
     HardwareMap hwMap;
 
@@ -22,6 +22,6 @@ public class hMap {
         hwMap = ahwMap;
         motorLeft = hwMap.dcMotor.get("motorLeft");
         motorRight = hwMap.dcMotor.get("motorRight");
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        //motorLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 }
