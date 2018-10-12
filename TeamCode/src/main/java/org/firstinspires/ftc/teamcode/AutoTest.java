@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
@@ -34,11 +35,7 @@ public class AutoTest extends LinearOpMode {
     hMap robot = new hMap();
 
 
-
-
-
-
-
+    ColorSensor color_sensor;
 
 
 
@@ -52,6 +49,7 @@ public class AutoTest extends LinearOpMode {
         robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        color_sensor = hardwareMap.colorSensor.get("color");
         waitForStart();
 
         //Start Auto
@@ -365,5 +363,12 @@ public class AutoTest extends LinearOpMode {
         robot.imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void colorSense(){
+        DriveForward(power);
+        if(color_sensor.red()>20){ 
+            StopDriving();
+        }
+    }
 
 }
