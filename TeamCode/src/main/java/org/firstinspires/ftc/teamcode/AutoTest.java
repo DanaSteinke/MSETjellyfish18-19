@@ -14,9 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import java.util.Locale;
 
-
-
-
 import org.firstinspires.ftc.teamcode.hMap;
 
 /**
@@ -28,7 +25,7 @@ public class AutoTest extends LinearOpMode {
     //Declare Gyro
     double heading;
     Orientation angles;
-    int run360=5476;
+    int run360=15000;
 
 
     hMap robot = new hMap();
@@ -48,14 +45,15 @@ public class AutoTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        composeTelemetry();
         robot.init(hardwareMap);
-        robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setHeadingToZero();
 
         waitForStart();
 
         //Start Auto
-        gyroToGo(90);
+
+        RotateDistance(0.5, run360);
 
 
     }
@@ -252,7 +250,7 @@ public class AutoTest extends LinearOpMode {
         int previousposition = rangeresult.position;
         double distance = rangeresult.distance;
         double previouspower = 0.5;
-        double powerlevel = 0.5;
+        double powerlevel =0.5;
         double k=0.7;
         while (true) {
             //update rangeresult
@@ -265,7 +263,7 @@ public class AutoTest extends LinearOpMode {
                 powerlevel = 0.7;
             }
             else{
-                powerlevel = k-3;
+                powerlevel = 0.5;
             }
 
             //turn or stop
@@ -364,6 +362,7 @@ public class AutoTest extends LinearOpMode {
         robot.gyroInit();
         robot.imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

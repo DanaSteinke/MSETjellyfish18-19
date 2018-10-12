@@ -38,7 +38,7 @@ public class hMap {
         motorLeft = hwMap.dcMotor.get("motorLeft");
         motorRight = hwMap.dcMotor.get("motorRight");
 
-        //motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        motorLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public void gyroInit() {
