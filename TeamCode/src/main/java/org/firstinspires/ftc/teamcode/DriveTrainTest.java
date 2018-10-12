@@ -34,6 +34,14 @@ public class DriveTrainTest extends LinearOpMode {
             motorLeft.setPower(-gamepad1.left_stick_y);
             motorRight.setPower(-gamepad1.right_stick_y);
 
+            //intkae servo
+            if (gamepad1.a) {
+                intake.setPower(0.7);
+            }
+            if (gamepad1.y) {
+                intake.setPower(0.5);
+            }
+
 
 
             //wait for hardware to catch up
