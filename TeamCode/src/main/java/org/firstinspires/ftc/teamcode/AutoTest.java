@@ -186,13 +186,18 @@ public class AutoTest extends LinearOpMode {
         public int position;
     }
 
+    //position 0= in range
+    //position 1= degree is greater than left
+    //position -1= degree is less than right
     RangeResult inRange(double angle, double offset) {
         RangeResult range = new RangeResult();
         telemetry.update();
         double degree = heading;
+        //find distance from angle to degree
         range.distance = Math.abs(angle - degree);
         double right = angle - offset;
         double left = angle + offset;
+        //if right is less than 0 degrees; out of bounds
         if (right < 0) {
             right = right + 360;
             if (degree > right || degree < left) {
@@ -200,6 +205,7 @@ public class AutoTest extends LinearOpMode {
             } else {
                 range.position = 1;
             }
+        //if left is greater than 360 degrees; out of bounds
         } else if (left >= 360) {
             left = left - 360;
             if (degree < left || degree > right) {
@@ -207,6 +213,10 @@ public class AutoTest extends LinearOpMode {
             } else {
                 range.position = -1;
             }
+        //normal conditions: if degree is greater than left, set position to 1
+        //else, if degree is less than right, set position to -1
+        //else, if not greater than left nor less than right, in range, set position to 0
+
         } else {
             if (degree > left) {
                 range.position = 1;
@@ -217,6 +227,7 @@ public class AutoTest extends LinearOpMode {
                 range.position = 0;
             }
         }
+        //find shortest distance: if greater than 180 degrees, change direction and subtract distance by 180
         if (range.distance > 180) {
             range.distance = range.distance - 180;
             if (range.position == -1) {
