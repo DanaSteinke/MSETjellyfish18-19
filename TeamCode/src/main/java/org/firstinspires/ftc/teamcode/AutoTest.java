@@ -36,10 +36,6 @@ public class AutoTest extends LinearOpMode {
 
 
 
-
-
-
-
     @Override
     public void runOpMode() throws InterruptedException {
         composeTelemetry();
@@ -53,18 +49,11 @@ public class AutoTest extends LinearOpMode {
 
         RotateDistance(0.5, run360);
 
+        telemetry.addData("drivepower",robot.motorLeft.getCurrentPosition());
+
+
 
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -363,9 +352,9 @@ public class AutoTest extends LinearOpMode {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void colorSense(){
+    void colorSense(double power){
         DriveForward(power);
-        if(color_sensor.red()>20){ 
+        if(color_sensor.red()>60){
             StopDriving();
         }
     }
