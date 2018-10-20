@@ -258,7 +258,7 @@ public class AutoTest extends LinearOpMode {
 
             //adjust power level
             if (distance > 40) {
-                powerlevel = 0.7;
+                powerlevel = 0.5;
             }
             else{
                 powerlevel = 0.5;

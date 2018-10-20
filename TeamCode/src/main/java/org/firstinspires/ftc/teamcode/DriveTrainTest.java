@@ -14,17 +14,20 @@ public class DriveTrainTest extends LinearOpMode {
     //Declare motors
     private DcMotor motorLeft;
     private DcMotor motorRight;
-    private CRServo intake;
+    private DcMotor lift;
+    //private CRServo intake;
 
     @Override
     public void runOpMode() throws InterruptedException {
         //initialize Motors
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
         motorRight = hardwareMap.dcMotor.get("motorRight");
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        lift = hardwareMap.dcMotor.get("lift");
+        //motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        motorRight.setDirection(DcMotor.Direction.REVERSE);
 
         //initialize Servos
-        intake = hardwareMap.crservo.get("intake");
+        //intake = hardwareMap.crservo.get("intake");
 
         //press start button
         waitForStart();
@@ -33,14 +36,18 @@ public class DriveTrainTest extends LinearOpMode {
             //tankDrive
             motorLeft.setPower(-gamepad1.left_stick_y);
             motorRight.setPower(-gamepad1.right_stick_y);
+            lift.setPower(gamepad2.left_stick_y);
 
             //intkae servo
+            /*
             if (gamepad1.a) {
                 intake.setPower(0.7);
             }
+
             if (gamepad1.y) {
                 intake.setPower(0.5);
             }
+            */
 
 
 
