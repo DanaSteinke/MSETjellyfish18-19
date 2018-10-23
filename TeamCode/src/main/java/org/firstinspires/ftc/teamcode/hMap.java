@@ -17,6 +17,8 @@ public class hMap {
     //Declare motors
     public DcMotor motorLeft;
     public DcMotor motorRight;
+    public DcMotor lift;
+
 
     // The IMU sensor object
     public BNO055IMU imu;
@@ -37,8 +39,8 @@ public class hMap {
         hwMap = ahwMap;
         motorLeft = hwMap.dcMotor.get("motorLeft");
         motorRight = hwMap.dcMotor.get("motorRight");
-
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        lift = hwMap.dcMotor.get("lift");
     }
 
     public void gyroInit() {

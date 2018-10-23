@@ -27,12 +27,13 @@ public class AutoTest extends LinearOpMode {
     double heading;
     Orientation angles;
     int run360=15000;
+    int rev=1120;
 
 
     hMap robot = new hMap();
 
 
-    ColorSensor color_sensor;
+    //ColorSensor color_sensor;
 
 
 
@@ -42,20 +43,46 @@ public class AutoTest extends LinearOpMode {
         robot.init(hardwareMap);
         setHeadingToZero();
 
-        color_sensor = hardwareMap.colorSensor.get("color");
+        //color_sensor = hardwareMap.colorSensor.get("color");
         waitForStart();
 
         //Start Auto
+        //color sensor
+        /*
+            String.format("red: ", color_sensor.red());
+            String.format("green: ", color_sensor.green());
+            String.format("blue: ", color_sensor.blue());
+        */
+        LiftUp(0.5, 1000);
 
-        RotateDistance(0.5, run360);
-
-        telemetry.addData("drivepower",robot.motorLeft.getCurrentPosition());
 
 
 
     }
 
+    //
+    public void LiftUp(double power, int position){
 
+        //Restart Encoders
+        //robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //Start Target Position
+        robot.lift.setTargetPosition(position);
+
+        //set RUN_TO_POSITION mode
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.lift.setPower(power);
+
+        while(robot.lift.isBusy()){
+
+            //wait until target position is reached
+
+        }
+        robot.lift.setPower(0.0);
+        robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
 
     //Driving Power Functions
     public void DriveForward(double power){
@@ -104,6 +131,10 @@ public class AutoTest extends LinearOpMode {
         robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+    public void DriveBackwardDistance(double power, int distance){
+        DriveForwardDistance(-power,-distance);
+    }
+
 
     void RotateDistance(double power, int distance) throws InterruptedException {
         {
@@ -362,12 +393,14 @@ public class AutoTest extends LinearOpMode {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    /*
     void colorSense(double power){
         DriveForward(power);
         if(color_sensor.red()>60){
             StopDriving();
         }
     }
+    */
+
 
 }

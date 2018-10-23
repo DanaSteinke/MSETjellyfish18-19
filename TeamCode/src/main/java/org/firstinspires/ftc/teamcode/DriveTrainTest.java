@@ -33,27 +33,67 @@ public class DriveTrainTest extends LinearOpMode {
         waitForStart();
         //while running, before pressing stop button
         while (opModeIsActive()) {
-            //tankDrive
-            motorLeft.setPower(-gamepad1.left_stick_y);
-            motorRight.setPower(-gamepad1.right_stick_y);
-            lift.setPower(gamepad2.left_stick_y);
+        //Gamepad 1 Drive Train Controller
 
-            //intkae servo
-            /*
-            if (gamepad1.a) {
-                intake.setPower(0.7);
+            //tankDrive
+            if(gamepad1.right_bumper){
+                motorLeft.setPower(-gamepad1.left_stick_y*0.25);
+                motorRight.setPower(-gamepad1.right_stick_y*0.25);
+            }
+            else {
+                motorLeft.setPower(-gamepad1.left_stick_y);
+                motorRight.setPower(-gamepad1.right_stick_y);
             }
 
-            if (gamepad1.y) {
-                intake.setPower(0.5);
+        //Gamepad 2 Robot Controller
+            //lift
+            if(gamepad2.x){
+                LiftUp(-1, -100);
+            }
+            else if(gamepad2.y){
+                LiftUp(1,100);
+            }
+            else{
+                lift.setPower(gamepad2.left_stick_y);
+            }
+
+            //intake servo
+            /*
+            if(gamepad2.a==false){
+                intake.setPower(0.0);
+            }
+            else{
+                intake.setPower(1.0);
             }
             */
+
 
 
 
             //wait for hardware to catch up
             idle();
         }
+
+    }
+
+    public void LiftUp(double power, int distance){
+
+        //Restart Encoders
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //Start Target Position
+        lift.setTargetPosition(lift.getCurrentPosition()+distance);
+
+        //set RUN_TO_POSITION mode
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift.setPower(power);
+        while(lift.isBusy()){
+
+            //wait until target position is reached
+
+        }
+        lift.setPower(0.0);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 }
