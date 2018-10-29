@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.hMap;
 /**
  * Created by Feranno on 9/29/18.
  */
-@Autonomous(name = "AutoTest")
-public class AutoTest extends LinearOpMode {
+@Autonomous(name = "AutoRedCrater")
+public class AutoRedCrater extends LinearOpMode {
 
     //Declare Gyro
     double heading;
@@ -56,20 +56,9 @@ public class AutoTest extends LinearOpMode {
         */
 
         LiftUp(-1, -40000);
-        RotateDistance(-0.5,-1000);
-        sleep(300);
-        /*
-        RotateDistance(0.5, 1000);
-        sleep(300);
-        DriveForwardDistance(0.5,4500);
-        sleep(300);
-        RotateDistance(-0.4, -700);
-        sleep(300);
-        robot.markerDispenser.setPosition(0);
-        sleep(2000);
-        DriveForwardDistance(-0.5, -1000);
-        sleep(300);
-        */
+        RotateDistance(-0.3, -1000);
+        //DriveForwardDistance(0.5, 4000);
+
 
     }
 
@@ -253,7 +242,7 @@ public class AutoTest extends LinearOpMode {
             } else {
                 range.position = 1;
             }
-        //if left is greater than 360 degrees; out of bounds
+            //if left is greater than 360 degrees; out of bounds
         } else if (left >= 360) {
             left = left - 360;
             if (degree < left || degree > right) {
@@ -261,9 +250,9 @@ public class AutoTest extends LinearOpMode {
             } else {
                 range.position = -1;
             }
-        //normal conditions: if degree is greater than left, set position to 1
-        //else, if degree is less than right, set position to -1
-        //else, if not greater than left nor less than right, in range, set position to 0
+            //normal conditions: if degree is greater than left, set position to 1
+            //else, if degree is less than right, set position to -1
+            //else, if not greater than left nor less than right, in range, set position to 0
 
         } else {
             if (degree > left) {
@@ -306,7 +295,7 @@ public class AutoTest extends LinearOpMode {
 
             //adjust power level
             if (distance > 40) {
-                powerlevel = 0.7;
+                powerlevel = 0.5;
             }
             else{
                 powerlevel = 0.5;

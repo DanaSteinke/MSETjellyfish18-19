@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -18,6 +19,9 @@ public class hMap {
     public DcMotor motorLeft;
     public DcMotor motorRight;
     public DcMotor lift;
+
+    //Declare servos
+    public Servo markerDispenser;
 
 
     // The IMU sensor object
@@ -41,6 +45,7 @@ public class hMap {
         motorRight = hwMap.dcMotor.get("motorRight");
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
         lift = hwMap.dcMotor.get("lift");
+        markerDispenser = hwMap.servo.get("markerDispenser");
     }
 
     public void gyroInit() {
