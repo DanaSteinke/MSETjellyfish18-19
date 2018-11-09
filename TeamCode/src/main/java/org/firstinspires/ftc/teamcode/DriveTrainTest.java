@@ -25,6 +25,8 @@ public class DriveTrainTest extends LinearOpMode {
         //initialize Motors
         intake = hardwareMap.crservo.get("intake");
         color_sensor = hardwareMap.colorSensor.get("color_sensor");
+
+
         //press start button
         waitForStart();
         //while running, before pressing stop button
