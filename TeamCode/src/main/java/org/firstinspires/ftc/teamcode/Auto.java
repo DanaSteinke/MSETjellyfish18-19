@@ -56,20 +56,9 @@ public class Auto extends LinearOpMode {
         */
 
         LiftUp(-1, -40000);
-        RotateDistance(-0.5,-1000);
-        sleep(300);
-        /*
-        RotateDistance(0.5, 1000);
-        sleep(300);
-        DriveForwardDistance(0.5,4500);
-        sleep(300);
-        RotateDistance(-0.4, -700);
-        sleep(300);
-        robot.markerDispenser.setPosition(0);
-        sleep(2000);
-        DriveForwardDistance(-0.5, -1000);
-        sleep(300);
-        */
+        RotateDistance(-0.3, -1000);
+        //DriveForwardDistance(0.5, 4000);
+
 
     }
 
@@ -101,20 +90,28 @@ public class Auto extends LinearOpMode {
 
     //Driving Power Functions
     public void DriveForward(double power){
-        robot.motorLeft.setPower(power);
-        robot.motorRight.setPower(power);
+        robot.frontLeft.setPower(power);
+        robot.frontRight.setPower(power);
+        robot.backRight.setPower(power);
+        robot.backLeft.setPower(power);
     }
     public void DriveBackward(double power){
-        robot.motorLeft.setPower(-power);
-        robot.motorRight.setPower(-power);
+        robot.frontLeft.setPower(-power);
+        robot.frontRight.setPower(-power);
+        robot.backRight.setPower(-power);
+        robot.backLeft.setPower(-power);
     }
     public void rotateLeft(double power){
-        robot.motorLeft.setPower(power);
-        robot.motorRight.setPower(-power);
+        robot.frontLeft.setPower(power);
+        robot.backLeft.setPower(power);
+        robot.frontRight.setPower(-power);
+        robot.backRight.setPower(-power);
     }
     public void rotateRight(double power){
-        robot.motorLeft.setPower(-power);
-        robot.motorRight.setPower(power);
+        robot.frontLeft.setPower(-power);
+        robot.backLeft.setPower(-power);
+        robot.frontRight.setPower(power);
+        robot.backRight.setPower(power);
     }
     public void StopDriving(){
         DriveForward(0.0);
@@ -124,94 +121,106 @@ public class Auto extends LinearOpMode {
     public void DriveForwardDistance(double power, int distance){
 
         //Restart Encoders
-        robot.motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Start Target Position
-        robot.motorLeft.setTargetPosition(robot.motorLeft.getCurrentPosition()+ distance);
-        robot.motorRight.setTargetPosition(robot.motorRight.getCurrentPosition() + distance);
+        robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition()+ distance);
+        robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition() + distance);
+        robot.frontRight.setTargetPosition(robot.backLeft.getCurrentPosition() + distance);
+        robot.backRight.setTargetPosition(robot.backLeft.getCurrentPosition() + distance);
 
         //set RUN_TO_POSITION mode
-        robot.motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         DriveForward(power);
 
-        while(robot.motorLeft.isBusy() && robot.motorRight.isBusy()){
-            telemetry.update();
-            telemetry.addData("motorLeft Encoder", robot.motorLeft.getCurrentPosition());
-            telemetry.addData("motorLeft setTartgetPosition", robot.motorLeft.getTargetPosition());
+        while(robot.frontRight.isBusy() && robot.backRight.isBusy() && robot.frontLeft.isBusy() && robot.backLeft.isBusy()){
             //wait until target position is reached
-
         }
         StopDriving();
-        robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-    public void DriveBackwardDistance(double power, int distance){
-        DriveForwardDistance(-power,-distance);
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    void VectorDistance(double power, int distance, double angle){
+        //reset encoders
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition()+distance);
+        robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition()+distance);
+        robot.frontRight.setTargetPosition(robot.frontRight.getCurrentPosition()-distance);
+        robot.backRight.setTargetPosition(robot.backRight.getCurrentPosition()-distance);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        double r = power;
+        double robotAngle = Math.toRadians(angle) - Math.PI / 4;
+        double v1 = r * Math.cos(robotAngle);
+        double v2 = r * Math.sin(robotAngle);
+        double v3 = r * Math.sin(robotAngle);
+        double v4 = r * Math.cos(robotAngle);
+
+        robot.frontLeft.setPower(v1);
+        robot.frontRight.setPower(v2);
+        robot.backLeft.setPower(v3);
+        robot.backRight.setPower(v4);
+
+        while (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() && robot.backRight.isBusy()) {
+            //wait until robot stops
+        }
+
+        StopDriving();
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
     void RotateDistance(double power, int distance) throws InterruptedException {
-        {
-            //reset encoders
-            robot.motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            robot.motorLeft.setTargetPosition(robot.motorLeft.getCurrentPosition()+distance);
-            robot.motorRight.setTargetPosition(robot.motorRight.getCurrentPosition()-distance);
+        //reset encoders
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition()+distance);
+        robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition()+distance);
+        robot.frontRight.setTargetPosition(robot.frontRight.getCurrentPosition()-distance);
+        robot.backRight.setTargetPosition(robot.backRight.getCurrentPosition()-distance);
 
 
-            robot.motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            rotateRight(power);
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            while (robot.motorLeft.isBusy() && robot.motorRight.isBusy()) {
-                //wait until robot stops
-            }
-
-            StopDriving();
-        }
-    }
-
-    //Timed Drive
-
-    public void DriveForwardTime(double power, long time) throws InterruptedException{
-        DriveForward(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-    public void DriveBackwardTime(double power, long time) throws InterruptedException{
-        DriveBackward(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-    public void TurnRightTime(double power, long time) throws InterruptedException{
         rotateRight(power);
-        Thread.sleep(time);
+
+        while (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() && robot.backRight.isBusy()) {
+            //wait until robot stops
+        }
+
         StopDriving();
-
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void TurnLeftTime(double power, long time) throws InterruptedException{
-        rotateLeft(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -253,7 +262,7 @@ public class Auto extends LinearOpMode {
             } else {
                 range.position = 1;
             }
-        //if left is greater than 360 degrees; out of bounds
+            //if left is greater than 360 degrees; out of bounds
         } else if (left >= 360) {
             left = left - 360;
             if (degree < left || degree > right) {
@@ -261,9 +270,9 @@ public class Auto extends LinearOpMode {
             } else {
                 range.position = -1;
             }
-        //normal conditions: if degree is greater than left, set position to 1
-        //else, if degree is less than right, set position to -1
-        //else, if not greater than left nor less than right, in range, set position to 0
+            //normal conditions: if degree is greater than left, set position to 1
+            //else, if degree is less than right, set position to -1
+            //else, if not greater than left nor less than right, in range, set position to 0
 
         } else {
             if (degree > left) {
@@ -306,7 +315,7 @@ public class Auto extends LinearOpMode {
 
             //adjust power level
             if (distance > 40) {
-                powerlevel = 0.7;
+                powerlevel = 0.5;
             }
             else{
                 powerlevel = 0.5;

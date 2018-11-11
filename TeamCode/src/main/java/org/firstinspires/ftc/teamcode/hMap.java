@@ -16,8 +16,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class hMap {
     //Declare motors
-    public DcMotor motorLeft;
-    public DcMotor motorRight;
+    public DcMotor frontLeft;
+    public DcMotor frontRight;
+    public DcMotor backLeft;
+    public DcMotor backRight;
     public DcMotor lift;
 
     //Declare servos
@@ -41,9 +43,12 @@ public class hMap {
 
     public void init(HardwareMap ahwMap) {
         hwMap = ahwMap;
-        motorLeft = hwMap.dcMotor.get("motorLeft");
-        motorRight = hwMap.dcMotor.get("motorRight");
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft = hwMap.dcMotor.get("frontLeft");
+        frontRight = hwMap.dcMotor.get("frontRight");
+        backLeft = hwMap.dcMotor.get("backLeft");
+        backRight = hwMap.dcMotor.get("backRight");
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
         lift = hwMap.dcMotor.get("lift");
         markerDispenser = hwMap.servo.get("markerDispenser");
     }

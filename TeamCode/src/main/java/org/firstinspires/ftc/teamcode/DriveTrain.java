@@ -13,52 +13,67 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @TeleOp(name = "DriveTrain", group = "TeleOp")
 public class DriveTrain extends LinearOpMode {
     //Declare motors
-    private DcMotor motorLeft;
-    private DcMotor motorRight;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    /*
     private DcMotor lift;
     private DcMotor plow;
     private Servo markerDispenser;
+    */
 
     //private CRServo intake;
 
     @Override
     public void runOpMode() throws InterruptedException {
         //initialize Motors
-        motorLeft = hardwareMap.dcMotor.get("motorLeft");
-        motorRight = hardwareMap.dcMotor.get("motorRight");
-        lift = hardwareMap.dcMotor.get("lift");
-        plow = hardwareMap.dcMotor.get("plow");
-        //motorLeft.setDirection(DcMotor.Direction.REVERSE);
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
+        backRight = hardwareMap.dcMotor.get("backRight");
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        //lift = hardwareMap.dcMotor.get("lift");
+        //plow = hardwareMap.dcMotor.get("plow");
 
         //initialize Servos
-        markerDispenser = hardwareMap.servo.get("markerDispenser");
+        //markerDispenser = hardwareMap.servo.get("markerDispenser");
         //intake = hardwareMap.crservo.get("intake");
 
         //press start button
         waitForStart();
         //while running, before pressing stop button
         while (opModeIsActive()) {
-            //Gamepad 1 Drive Train Controller
+        //Gamepad 1 Drive Train Controller
+            //field centric drive
+            double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
+            double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            double rightX = gamepad1.right_stick_x;
+            double v1 = r * Math.cos(robotAngle) + rightX;
+            double v2 = r * Math.sin(robotAngle) - rightX;
+            double v3 = r * Math.sin(robotAngle) + rightX;
+            double v4 = r * Math.cos(robotAngle) - rightX;
 
-            //tankDrive
-            if (gamepad1.right_bumper) {
-                motorRight.setPower(-gamepad1.left_stick_y * 0.35);
-                motorLeft.setPower(-gamepad1.right_stick_y * 0.35);
-            } else {
-                motorRight.setPower(-gamepad1.left_stick_y);
-                motorLeft.setPower(-gamepad1.right_stick_y);
-            }
-            //Encoder Position
-            telemetry.addData("Encoder Position", motorLeft.getCurrentPosition());
-            telemetry.addData("Power", motorLeft.getPower());
+            frontLeft.setPower(v1);
+            frontRight.setPower(v2);
+            backLeft.setPower(v3);
+            backRight.setPower(v4);
+
+            //Motor Encoder Positions
+            /*
+            telemetry.addData("Encoder Position", frontLeft.getCurrentPosition());
+            telemetry.addData("Power", frontLeft.getPower());
             telemetry.addData("Lift Encoder Position", lift.getCurrentPosition());
             telemetry.addData("Lift Power ", lift.getPower());
             telemetry.update();
+            */
 
 
-            //Gamepad 2 Robot Controller
+         //Gamepad 2 Robot Controller
             //lift
+            /*
             lift.setPower(gamepad2.left_stick_y);
 
 
@@ -71,6 +86,7 @@ public class DriveTrain extends LinearOpMode {
             } else if (gamepad2.y) {
                 markerDispenser.setPosition(0.5);
             }
+            */
 
 
             //intake servo
@@ -90,7 +106,7 @@ public class DriveTrain extends LinearOpMode {
         }
 
     }
-
+/*
     public void LiftUp(double power, int position) {
 
         //Restart Encoders
@@ -111,5 +127,6 @@ public class DriveTrain extends LinearOpMode {
         lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
+    */
 }
 

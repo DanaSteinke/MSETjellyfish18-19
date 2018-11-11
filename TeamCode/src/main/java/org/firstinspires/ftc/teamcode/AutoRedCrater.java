@@ -90,20 +90,28 @@ public class AutoRedCrater extends LinearOpMode {
 
     //Driving Power Functions
     public void DriveForward(double power){
-        robot.motorLeft.setPower(power);
-        robot.motorRight.setPower(power);
+        robot.frontLeft.setPower(power);
+        robot.frontRight.setPower(power);
+        robot.backRight.setPower(power);
+        robot.backLeft.setPower(power);
     }
     public void DriveBackward(double power){
-        robot.motorLeft.setPower(-power);
-        robot.motorRight.setPower(-power);
+        robot.frontLeft.setPower(-power);
+        robot.frontRight.setPower(-power);
+        robot.backRight.setPower(-power);
+        robot.backLeft.setPower(-power);
     }
     public void rotateLeft(double power){
-        robot.motorLeft.setPower(power);
-        robot.motorRight.setPower(-power);
+        robot.frontLeft.setPower(power);
+        robot.backLeft.setPower(power);
+        robot.frontRight.setPower(-power);
+        robot.backRight.setPower(-power);
     }
     public void rotateRight(double power){
-        robot.motorLeft.setPower(-power);
-        robot.motorRight.setPower(power);
+        robot.frontLeft.setPower(-power);
+        robot.backLeft.setPower(-power);
+        robot.frontRight.setPower(power);
+        robot.backRight.setPower(power);
     }
     public void StopDriving(){
         DriveForward(0.0);
@@ -113,29 +121,33 @@ public class AutoRedCrater extends LinearOpMode {
     public void DriveForwardDistance(double power, int distance){
 
         //Restart Encoders
-        robot.motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Start Target Position
-        robot.motorLeft.setTargetPosition(robot.motorLeft.getCurrentPosition()+ distance);
-        robot.motorRight.setTargetPosition(robot.motorRight.getCurrentPosition() + distance);
+        robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition()+ distance);
+        robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition() + distance);
+        robot.frontRight.setTargetPosition(robot.backLeft.getCurrentPosition() + distance);
+        robot.backRight.setTargetPosition(robot.backLeft.getCurrentPosition() + distance);
 
         //set RUN_TO_POSITION mode
-        robot.motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         DriveForward(power);
 
-        while(robot.motorLeft.isBusy() && robot.motorRight.isBusy()){
-            telemetry.update();
-            telemetry.addData("motorLeft Encoder", robot.motorLeft.getCurrentPosition());
-            telemetry.addData("motorLeft setTartgetPosition", robot.motorLeft.getTargetPosition());
+        while(robot.frontRight.isBusy() && robot.backRight.isBusy() && robot.frontLeft.isBusy() && robot.backLeft.isBusy()){
             //wait until target position is reached
-
         }
         StopDriving();
-        robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void DriveBackwardDistance(double power, int distance){
         DriveForwardDistance(-power,-distance);
@@ -143,65 +155,37 @@ public class AutoRedCrater extends LinearOpMode {
 
 
     void RotateDistance(double power, int distance) throws InterruptedException {
-        {
+
             //reset encoders
-            robot.motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            robot.motorLeft.setTargetPosition(robot.motorLeft.getCurrentPosition()+distance);
-            robot.motorRight.setTargetPosition(robot.motorRight.getCurrentPosition()-distance);
+            robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition()+distance);
+            robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition()+distance);
+            robot.frontRight.setTargetPosition(robot.frontRight.getCurrentPosition()-distance);
+            robot.backRight.setTargetPosition(robot.backRight.getCurrentPosition()-distance);
 
 
-            robot.motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             rotateRight(power);
 
-            while (robot.motorLeft.isBusy() && robot.motorRight.isBusy()) {
+            while (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() && robot.backRight.isBusy()) {
                 //wait until robot stops
             }
 
             StopDriving();
-        }
+            robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-
-    //Timed Drive
-
-    public void DriveForwardTime(double power, long time) throws InterruptedException{
-        DriveForward(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-    public void DriveBackwardTime(double power, long time) throws InterruptedException{
-        DriveBackward(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-    public void TurnRightTime(double power, long time) throws InterruptedException{
-        rotateRight(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-    public void TurnLeftTime(double power, long time) throws InterruptedException{
-        rotateLeft(power);
-        Thread.sleep(time);
-        StopDriving();
-
-    }
-
-
-
-
-
-
-
-
-
-
-
 
 
     //Gyro

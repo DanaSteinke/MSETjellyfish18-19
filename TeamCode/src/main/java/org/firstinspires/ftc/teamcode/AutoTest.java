@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import java.util.Locale;
+import java.util.Vector;
 
 
 import org.firstinspires.ftc.teamcode.hMap;
@@ -36,8 +37,11 @@ import org.firstinspires.ftc.teamcode.hMap;
         // The IMU sensor object
         public BNO055IMU imu;
         int rev=1120;
-        DcMotor motorLeft;
-        DcMotor motorRight;
+        private DcMotor frontLeft;
+        private DcMotor frontRight;
+        private DcMotor backLeft;
+        private DcMotor backRight;
+
 
 
         ColorSensor color_sensor;
@@ -51,14 +55,16 @@ import org.firstinspires.ftc.teamcode.hMap;
             setHeadingToZero();
 
             color_sensor = hardwareMap.colorSensor.get("color");
-            motorLeft = hardwareMap.dcMotor.get("motorLeft");
-            motorRight =  hardwareMap.dcMotor.get("motorRight");
+            frontLeft = hardwareMap.dcMotor.get("frontLeft");
+            frontRight = hardwareMap.dcMotor.get("frontRight");
+            backLeft = hardwareMap.dcMotor.get("backLeft");
+            backRight = hardwareMap.dcMotor.get("backRight");
 
 
             waitForStart();
             //Start Auto
 
-
+/*
             while(tapeColor().equals("red")==false){
                 telemetry.update();
                 String.format("red: ", color_sensor.red());
@@ -68,85 +74,149 @@ import org.firstinspires.ftc.teamcode.hMap;
             }
             StopDriving();
             sleep(300);
-
+            */
+            VectorDistance(0.5,5000,90);
+            sleep(300);
+            VectorDistance(0.5,5000,-90);
+            sleep(300);
+            VectorDistance(0.5,5000,0);
+            sleep(300);
+            VectorDistance(0.5,5000,180);
+            sleep(3000);
 
 
         }
         //Driving Power Functions
         public void DriveForward(double power){
-            motorLeft.setPower(power);
-            motorRight.setPower(power);
+            frontLeft.setPower(power);
+            frontRight.setPower(power);
+            backRight.setPower(power);
+            backLeft.setPower(power);
         }
         public void DriveBackward(double power){
-            motorLeft.setPower(-power);
-            motorRight.setPower(-power);
+            DriveForward(-power);
         }
         public void rotateLeft(double power){
-            motorLeft.setPower(power);
-            motorRight.setPower(-power);
+            frontLeft.setPower(power);
+            frontRight.setPower(-power);
+            backRight.setPower(-power);
+            backLeft.setPower(power);
         }
         public void rotateRight(double power){
-            motorLeft.setPower(-power);
-            motorRight.setPower(power);
+            frontLeft.setPower(-power);
+            frontRight.setPower(power);
+            backRight.setPower(power);
+            backLeft.setPower(-power);
         }
         public void StopDriving(){
             DriveForward(0.0);
         }
 
         //Encoder Functions
-        public void DriveForwardDistance(double power, int distance){
+        public void DriveVeriticalDistance(double power, int distance){
 
             //Restart Encoders
-            motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             //Start Target Position
-            motorLeft.setTargetPosition(motorLeft.getCurrentPosition()+ distance);
-            motorRight.setTargetPosition(motorRight.getCurrentPosition() + distance);
+            frontLeft.setTargetPosition(frontLeft.getCurrentPosition()+ distance);
+            backLeft.setTargetPosition(backLeft.getCurrentPosition() + distance);
+            frontRight.setTargetPosition(backLeft.getCurrentPosition() + distance);
+            backRight.setTargetPosition(backLeft.getCurrentPosition() + distance);
 
             //set RUN_TO_POSITION mode
-            motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             DriveForward(power);
 
-            while(motorLeft.isBusy() && motorRight.isBusy()){
-                telemetry.update();
-                telemetry.addData("motorLeft Encoder", motorLeft.getCurrentPosition());
-                telemetry.addData("motorLeft setTartgetPosition", motorLeft.getTargetPosition());
+            while(frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy()){
                 //wait until target position is reached
-
             }
             StopDriving();
-            motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
-        public void DriveBackwardDistance(double power, int distance){
-            DriveForwardDistance(-power,-distance);
+
+        void VectorDistance(double power, int distance, double angle){
+            //reset encoders
+            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            frontLeft.setTargetPosition(frontLeft.getCurrentPosition()+distance);
+            backLeft.setTargetPosition(backLeft.getCurrentPosition()+distance);
+            frontRight.setTargetPosition(frontRight.getCurrentPosition()-distance);
+            backRight.setTargetPosition(backRight.getCurrentPosition()-distance);
+
+            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            double r = power;
+            double robotAngle = Math.toRadians(angle) - Math.PI / 4;
+            double v1 = r * Math.cos(robotAngle);
+            double v2 = r * Math.sin(robotAngle);
+            double v3 = r * Math.sin(robotAngle);
+            double v4 = r * Math.cos(robotAngle);
+
+            frontLeft.setPower(v1);
+            frontRight.setPower(v2);
+            backLeft.setPower(v3);
+            backRight.setPower(v4);
+
+            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                //wait until robot stops
+            }
+
+            StopDriving();
+            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
 
         void RotateDistance(double power, int distance) throws InterruptedException {
-            {
-                //reset encoders
-                motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-                motorLeft.setTargetPosition(motorLeft.getCurrentPosition()+distance);
-                motorRight.setTargetPosition(motorRight.getCurrentPosition()-distance);
+            //reset encoders
+            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            frontLeft.setTargetPosition(frontLeft.getCurrentPosition()+distance);
+            backLeft.setTargetPosition(backLeft.getCurrentPosition()+distance);
+            frontRight.setTargetPosition(frontRight.getCurrentPosition()-distance);
+            backRight.setTargetPosition(backRight.getCurrentPosition()-distance);
 
 
-                motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                rotateRight(power);
+            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                while (motorLeft.isBusy() && motorRight.isBusy()) {
-                    //wait until robot stops
-                }
+            rotateRight(power);
 
-                StopDriving();
+            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                //wait until robot stops
             }
+
+            StopDriving();
+            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
         //Timed Drive
@@ -210,8 +280,8 @@ import org.firstinspires.ftc.teamcode.hMap;
         //position 0= in range
         //position 1= degree is greater than left
         //position -1= degree is less than right
-        org.firstinspires.ftc.teamcode.Auto.RangeResult inRange(double angle, double offset) {
-            org.firstinspires.ftc.teamcode.Auto.RangeResult range = new org.firstinspires.ftc.teamcode.Auto.RangeResult();
+        RangeResult inRange(double angle, double offset) {
+           RangeResult range = new RangeResult();
             telemetry.update();
             double degree = heading;
             //find distance from angle to degree
@@ -264,7 +334,7 @@ import org.firstinspires.ftc.teamcode.hMap;
         //turn right when 1
         public void gyroToGo(double angle) throws InterruptedException {
             double angleoffset = 4;
-            org.firstinspires.ftc.teamcode.Auto.RangeResult rangeresult = inRange(angle, angleoffset);
+            RangeResult rangeresult = inRange(angle, angleoffset);
             int position = rangeresult.position;
             int previousposition = rangeresult.position;
             double distance = rangeresult.distance;
@@ -407,6 +477,8 @@ import org.firstinspires.ftc.teamcode.hMap;
             }
 
         }
+
+
 
 
     }
