@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -44,7 +45,7 @@ import org.firstinspires.ftc.teamcode.hMap;
 
 
 
-        ColorSensor color_sensor;
+        //ColorSensor color_sensor;
 
 
 
@@ -54,11 +55,13 @@ import org.firstinspires.ftc.teamcode.hMap;
             gyroInit();
             setHeadingToZero();
 
-            color_sensor = hardwareMap.colorSensor.get("color");
+            //color_sensor = hardwareMap.colorSensor.get("color");
             frontLeft = hardwareMap.dcMotor.get("frontLeft");
             frontRight = hardwareMap.dcMotor.get("frontRight");
             backLeft = hardwareMap.dcMotor.get("backLeft");
             backRight = hardwareMap.dcMotor.get("backRight");
+            frontLeft.setDirection(DcMotor.Direction.REVERSE);
+            backLeft.setDirection(DcMotor.Direction.REVERSE);
 
 
             waitForStart();
@@ -75,14 +78,18 @@ import org.firstinspires.ftc.teamcode.hMap;
             StopDriving();
             sleep(300);
             */
-            VectorDistance(0.5,5000,90);
-            sleep(300);
-            VectorDistance(0.5,5000,-90);
-            sleep(300);
-            VectorDistance(0.5,5000,0);
-            sleep(300);
-            VectorDistance(0.5,5000,180);
-            sleep(3000);
+           DriveVeriticalDistance(0.5,1500);
+           sleep(300);
+           DriveVeriticalDistance(-0.5, -1500);
+           sleep(300);
+           VectorDistance(0.5,2000,90,0);
+           sleep(300);
+           VectorDistance(0.5,2000,180,0);
+           sleep(300);
+           VectorDistance(0.5,2000,270,0);
+           sleep(300);
+           VectorDistance(0.5,2000,0,0);
+
 
 
         }
@@ -137,6 +144,12 @@ import org.firstinspires.ftc.teamcode.hMap;
 
             while(frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy()){
                 //wait until target position is reached
+                telemetry.update();
+                telemetry.addData("frontLeft:",frontLeft.getPower());
+                telemetry.addData("frontRight:",frontLeft.getPower());
+                telemetry.addData("backLeft:",frontLeft.getPower());
+                telemetry.addData("backRight:",frontLeft.getPower());
+
             }
             StopDriving();
             frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -145,7 +158,15 @@ import org.firstinspires.ftc.teamcode.hMap;
             backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        void VectorDistance(double power, int distance, double angle){
+        void VectorDistance(double power, int distance, double angle, int rotationalAngle){
+            double r = power;
+            double robotAngle = Math.toRadians(angle) - Math.PI / 4;
+            double rotateAngle = Math.toRadians(rotationalAngle);
+            double v1 = r * Math.cos(robotAngle)+rotateAngle;
+            double v2 = r * Math.sin(robotAngle)-rotateAngle;
+            double v3 = r * Math.sin(robotAngle)+rotateAngle;
+            double v4 = r * Math.cos(robotAngle)-rotateAngle;
+
             //reset encoders
             frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -154,20 +175,13 @@ import org.firstinspires.ftc.teamcode.hMap;
 
             frontLeft.setTargetPosition(frontLeft.getCurrentPosition()+distance);
             backLeft.setTargetPosition(backLeft.getCurrentPosition()+distance);
-            frontRight.setTargetPosition(frontRight.getCurrentPosition()-distance);
-            backRight.setTargetPosition(backRight.getCurrentPosition()-distance);
+            frontRight.setTargetPosition(frontRight.getCurrentPosition()+distance);
+            backRight.setTargetPosition(backRight.getCurrentPosition()+distance);
 
             frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            double r = power;
-            double robotAngle = Math.toRadians(angle) - Math.PI / 4;
-            double v1 = r * Math.cos(robotAngle);
-            double v2 = r * Math.sin(robotAngle);
-            double v3 = r * Math.sin(robotAngle);
-            double v4 = r * Math.cos(robotAngle);
 
             frontLeft.setPower(v1);
             frontRight.setPower(v2);
@@ -176,6 +190,11 @@ import org.firstinspires.ftc.teamcode.hMap;
 
             while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
                 //wait until robot stops
+                telemetry.update();
+                telemetry.addData("frontLeft:", frontLeft.getPower());
+                telemetry.addData("frontRight:",frontRight.getPower());
+                telemetry.addData("backLeft:", backLeft.getPower());
+                telemetry.addData("backRight:",backRight.getPower());
             }
 
             StopDriving();
@@ -464,7 +483,7 @@ import org.firstinspires.ftc.teamcode.hMap;
             imu = hardwareMap.get(BNO055IMU.class, "imu");
             imu.initialize(parameters);
         }
-
+/*
         public String tapeColor() {
             if(color_sensor.red()>200 ){
                 return "red";
@@ -477,6 +496,7 @@ import org.firstinspires.ftc.teamcode.hMap;
             }
 
         }
+        */
 
 
 

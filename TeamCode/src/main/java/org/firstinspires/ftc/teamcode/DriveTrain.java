@@ -61,6 +61,17 @@ public class DriveTrain extends LinearOpMode {
             backLeft.setPower(v3);
             backRight.setPower(v4);
 
+            telemetry.update();
+            telemetry.addData("EfrontLeft:", frontLeft.getCurrentPosition());
+            telemetry.addData("PfrontLeft:",frontLeft.getPower());
+            telemetry.addData("EfrontRight:", frontRight.getCurrentPosition());
+            telemetry.addData("PfrontRight:",frontRight.getPower());
+            telemetry.addData("EbackLeft:", backLeft.getCurrentPosition());
+            telemetry.addData("Pbackeft:",backLeft.getPower());
+            telemetry.addData("EbackRight:", backRight.getCurrentPosition());
+            telemetry.addData("PbackRight:",backRight.getPower());
+
+
             //Motor Encoder Positions
             /*
             telemetry.addData("Encoder Position", frontLeft.getCurrentPosition());

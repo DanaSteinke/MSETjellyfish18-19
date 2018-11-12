@@ -49,7 +49,7 @@ public class DriveTrainTest extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.update();
          //Gamepad 1 DriveTrain Controller
-            //drivetrain motors
+            //field centric drive
             double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
@@ -62,6 +62,16 @@ public class DriveTrainTest extends LinearOpMode {
             frontRight.setPower(v2);
             backLeft.setPower(v3);
             backRight.setPower(v4);
+
+            telemetry.update();
+            telemetry.addData("EfrontLeft:", frontLeft.getCurrentPosition());
+            telemetry.addData("PfrontLeft:",frontLeft.getPower());
+            telemetry.addData("EfrontRight:", frontRight.getCurrentPosition());
+            telemetry.addData("PfrontRight:",frontRight.getPower());
+            telemetry.addData("EbackLeft:", backLeft.getCurrentPosition());
+            telemetry.addData("Pbackeft:",backLeft.getPower());
+            telemetry.addData("EbackRight:", backRight.getCurrentPosition());
+            telemetry.addData("PbackRight:",backRight.getPower());
 
 
 
