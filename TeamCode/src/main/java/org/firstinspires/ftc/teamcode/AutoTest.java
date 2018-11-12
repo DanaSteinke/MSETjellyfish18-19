@@ -78,17 +78,18 @@ import org.firstinspires.ftc.teamcode.hMap;
             StopDriving();
             sleep(300);
             */
+
            DriveVeriticalDistance(0.5,1500);
            sleep(300);
            DriveVeriticalDistance(-0.5, -1500);
            sleep(300);
-           VectorDistance(0.5,2000,90,0);
+           VectorDistance(0.5,1500,90,0);
            sleep(300);
-           VectorDistance(0.5,2000,180,0);
+           VectorDistance(0.5,1500,180,0);
            sleep(300);
-           VectorDistance(0.5,2000,270,0);
+           VectorDistance(0.5,1500,270,0);
            sleep(300);
-           VectorDistance(0.5,2000,0,0);
+           VectorDistance(0.5,1500,0,0);
 
 
 
@@ -151,6 +152,7 @@ import org.firstinspires.ftc.teamcode.hMap;
                 telemetry.addData("backRight:",frontLeft.getPower());
 
             }
+
             StopDriving();
             frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -158,14 +160,38 @@ import org.firstinspires.ftc.teamcode.hMap;
             backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        void VectorDistance(double power, int distance, double angle, int rotationalAngle){
+        int positiveNegative(double x){
+            int result=1;
+            if(x<0){
+                result=-1;
+            }
+            return result;
+        }
+
+        void VectorDistance(double power, int distance, double directionalAngle, int rotationalPower){
             double r = power;
-            double robotAngle = Math.toRadians(angle) - Math.PI / 4;
-            double rotateAngle = Math.toRadians(rotationalAngle);
+            double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
+            double rotateAngle = Math.toRadians(rotationalPower);
+            //calculate voltage for each motor
             double v1 = r * Math.cos(robotAngle)+rotateAngle;
             double v2 = r * Math.sin(robotAngle)-rotateAngle;
             double v3 = r * Math.sin(robotAngle)+rotateAngle;
             double v4 = r * Math.cos(robotAngle)-rotateAngle;
+
+            //calculate distance for each motor
+            double vMax=0;
+            double[] vArray={v1,v2,v3,v4};
+            for(double voltage: vArray){
+                if(voltage>vMax){
+                    vMax=voltage;
+                }
+            }
+            //unique motor distance= percentage(+/-) * distance)
+                int d1 = (int) (v1 / vMax) * distance;
+                int d2 = (int) (v2 / vMax) * distance;
+                int d3 = (int) (v3 / vMax) * distance;
+                int d4 = (int) (v4 / vMax) * distance;
+
 
             //reset encoders
             frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -173,10 +199,13 @@ import org.firstinspires.ftc.teamcode.hMap;
             frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            frontLeft.setTargetPosition(frontLeft.getCurrentPosition()+distance);
-            backLeft.setTargetPosition(backLeft.getCurrentPosition()+distance);
-            frontRight.setTargetPosition(frontRight.getCurrentPosition()+distance);
-            backRight.setTargetPosition(backRight.getCurrentPosition()+distance);
+            //check that motor(frontLeft,backLeft,frontRight,backRight) corresponds with voltage and unique motor distance
+            //MOTOR ORDER MATTERS
+            //ex: frontLeft=>v1 and d1
+            frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + (distance*positiveNegative(v1)));
+            frontRight.setTargetPosition(frontRight.getCurrentPosition() + (distance*positiveNegative(v2)));
+            backLeft.setTargetPosition(backLeft.getCurrentPosition() + (distance*positiveNegative(v3)));
+            backRight.setTargetPosition(backRight.getCurrentPosition() + (distance*positiveNegative(v4)));
 
             frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -191,10 +220,21 @@ import org.firstinspires.ftc.teamcode.hMap;
             while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
                 //wait until robot stops
                 telemetry.update();
+                telemetry.addData("v1",v1);
+                telemetry.addData("v2",v2);
+                telemetry.addData("v3",v3);
+                telemetry.addData("v4",v4);
+
+                telemetry.addData("d1",d1);
+                telemetry.addData("d2",d2);
+                telemetry.addData("d3",d3);
+                telemetry.addData("d4",d4);
+
                 telemetry.addData("frontLeft:", frontLeft.getPower());
                 telemetry.addData("frontRight:",frontRight.getPower());
                 telemetry.addData("backLeft:", backLeft.getPower());
                 telemetry.addData("backRight:",backRight.getPower());
+
             }
 
             StopDriving();
