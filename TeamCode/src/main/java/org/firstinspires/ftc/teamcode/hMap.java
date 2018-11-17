@@ -20,9 +20,10 @@ public class hMap {
     public DcMotor frontRight;
     public DcMotor backLeft;
     public DcMotor backRight;
-    public DcMotor lift;
+    //public DcMotor lift;
 
     //Declare servos
+    //public CRServo intake;
     public Servo markerDispenser;
 
 
@@ -48,8 +49,10 @@ public class hMap {
         backLeft = hwMap.dcMotor.get("backLeft");
         backRight = hwMap.dcMotor.get("backRight");
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        lift = hwMap.dcMotor.get("lift");
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        //intake = hwMap.crservo.get("intake");
+        //lift = hwMap.dcMotor.get("lift");
         markerDispenser = hwMap.servo.get("markerDispenser");
     }
 

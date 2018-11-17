@@ -12,65 +12,46 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "DriveTrain", group = "TeleOp")
 public class DriveTrain extends LinearOpMode {
-    //Declare motors
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor backLeft;
-    private DcMotor backRight;
-    /*
-    private DcMotor lift;
-    private DcMotor plow;
-    private Servo markerDispenser;
-    */
+    hMap robot = new hMap();
 
-    //private CRServo intake;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //initialize Motors
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        backLeft = hardwareMap.dcMotor.get("backLeft");
-        backRight = hardwareMap.dcMotor.get("backRight");
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-
-        //lift = hardwareMap.dcMotor.get("lift");
-        //plow = hardwareMap.dcMotor.get("plow");
-
-        //initialize Servos
-        //markerDispenser = hardwareMap.servo.get("markerDispenser");
-        //intake = hardwareMap.crservo.get("intake");
+        robot.init(hardwareMap);
 
         //press start button
         waitForStart();
         //while running, before pressing stop button
         while (opModeIsActive()) {
         //Gamepad 1 Drive Train Controller
+            //tank drive
             //field centric drive
-            double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            //because of joystick positions, change yValue to reverse, then Quadrants will be in position
+            double yValue=-gamepad1.left_stick_y;
+            double xValue=gamepad1.left_stick_x;
+            double r = Math.hypot(xValue, yValue);
+            double robotAngle = Math.atan2(yValue, xValue) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
             double v1 = r * Math.cos(robotAngle) + rightX;
             double v2 = r * Math.sin(robotAngle) - rightX;
             double v3 = r * Math.sin(robotAngle) + rightX;
             double v4 = r * Math.cos(robotAngle) - rightX;
 
-            frontLeft.setPower(v1);
-            frontRight.setPower(v2);
-            backLeft.setPower(v3);
-            backRight.setPower(v4);
+            robot.frontLeft.setPower(v1);
+            robot.frontRight.setPower(v2);
+            robot.backLeft.setPower(v3);
+            robot.backRight.setPower(v4);
+
 
             telemetry.update();
-            telemetry.addData("EfrontLeft:", frontLeft.getCurrentPosition());
-            telemetry.addData("PfrontLeft:",frontLeft.getPower());
-            telemetry.addData("EfrontRight:", frontRight.getCurrentPosition());
-            telemetry.addData("PfrontRight:",frontRight.getPower());
-            telemetry.addData("EbackLeft:", backLeft.getCurrentPosition());
-            telemetry.addData("Pbackeft:",backLeft.getPower());
-            telemetry.addData("EbackRight:", backRight.getCurrentPosition());
-            telemetry.addData("PbackRight:",backRight.getPower());
-
+            telemetry.addData("leftstick_y",gamepad2.left_stick_y);
+            telemetry.addData("rightstick_y", gamepad2.right_stick_y);
+            telemetry.addData("leftstick_x",gamepad2.left_stick_x);
+            telemetry.addData("rightstick_x", gamepad2.right_stick_x);
+            telemetry.addData("PfrontLeft:", robot.frontLeft.getPower());
+            telemetry.addData("PfrontRight:", robot.frontRight.getPower());
+            telemetry.addData("PbackLeft:", robot.backLeft.getPower());
+            telemetry.addData("PbackRight:", robot.backRight.getPower());
 
             //Motor Encoder Positions
             /*
@@ -84,20 +65,11 @@ public class DriveTrain extends LinearOpMode {
 
          //Gamepad 2 Robot Controller
             //lift
-            /*
-            lift.setPower(gamepad2.left_stick_y);
-
-
-            //plow
-            plow.setPower(gamepad2.right_stick_y * 0.25);
-
+            //robot.lift.setPower(gamepad2.left_stick_y);
             //marker disposer
-            if (gamepad2.x) {
-                markerDispenser.setPosition(0);
-            } else if (gamepad2.y) {
-                markerDispenser.setPosition(0.5);
-            }
-            */
+            robot.markerDispenser.setPosition(gamepad2.right_stick_y);
+            telemetry.addData("markerPosition:",robot.markerDispenser.getPosition());
+
 
 
             //intake servo

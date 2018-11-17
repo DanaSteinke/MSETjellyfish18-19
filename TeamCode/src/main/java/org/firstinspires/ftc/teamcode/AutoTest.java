@@ -33,7 +33,7 @@ import org.firstinspires.ftc.teamcode.hMap;
         double heading;
         public Orientation angles;
         public Acceleration gravity;
-        int run360=15000;
+        final int run360=6962;
 
         // The IMU sensor object
         public BNO055IMU imu;
@@ -79,17 +79,22 @@ import org.firstinspires.ftc.teamcode.hMap;
             sleep(300);
             */
 
-           DriveVeriticalDistance(0.5,1500);
+           VectorDistance(0, run360, 0, 1);
            sleep(300);
-           DriveVeriticalDistance(-0.5, -1500);
+           VectorDistance(0,run360,0,0.5);
            sleep(300);
-           VectorDistance(0.5,1500,90,0);
+           VectorDistance(0,run360/2,0,-1);
            sleep(300);
-           VectorDistance(0.5,1500,180,0);
+           VectorDistance(0.5,run360/2,0,-0.7);
+
            sleep(300);
-           VectorDistance(0.5,1500,270,0);
+           VectorDistance(0.7,1500,90,0);
            sleep(300);
-           VectorDistance(0.5,1500,0,0);
+           VectorDistance(0.7,1500,180,0);
+           sleep(300);
+           VectorDistance(0.7,1500,270,0);
+           sleep(300);
+           VectorDistance(0.7,1500,0,0);
 
 
 
@@ -168,10 +173,12 @@ import org.firstinspires.ftc.teamcode.hMap;
             return result;
         }
 
-        void VectorDistance(double power, int distance, double directionalAngle, int rotationalPower){
+        //if rotationalPower, insert power:0 and directionalAngle:0
+        //power and rotational power between -1 and 1
+        void VectorDistance(double power, int distance, double directionalAngle, double rotationalPower){
             double r = power;
             double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
-            double rotateAngle = Math.toRadians(rotationalPower);
+            double rotateAngle = rotationalPower;
             //calculate voltage for each motor
             double v1 = r * Math.cos(robotAngle)+rotateAngle;
             double v2 = r * Math.sin(robotAngle)-rotateAngle;
@@ -186,11 +193,13 @@ import org.firstinspires.ftc.teamcode.hMap;
                     vMax=voltage;
                 }
             }
-            //unique motor distance= percentage(+/-) * distance)
+            //unique motor distance= percentage(+/-) * distance
+            /*
                 int d1 = (int) (v1 / vMax) * distance;
                 int d2 = (int) (v2 / vMax) * distance;
                 int d3 = (int) (v3 / vMax) * distance;
                 int d4 = (int) (v4 / vMax) * distance;
+                */
 
 
             //reset encoders
@@ -199,13 +208,14 @@ import org.firstinspires.ftc.teamcode.hMap;
             frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            //check that motor(frontLeft,backLeft,frontRight,backRight) corresponds with voltage and unique motor distance
-            //MOTOR ORDER MATTERS
-            //ex: frontLeft=>v1 and d1
-            frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + (distance*positiveNegative(v1)));
-            frontRight.setTargetPosition(frontRight.getCurrentPosition() + (distance*positiveNegative(v2)));
-            backLeft.setTargetPosition(backLeft.getCurrentPosition() + (distance*positiveNegative(v3)));
-            backRight.setTargetPosition(backRight.getCurrentPosition() + (distance*positiveNegative(v4)));
+                //check that motor(frontLeft,backLeft,frontRight,backRight) corresponds with voltage and unique motor distance
+                //MOTOR ORDER MATTERS
+                //ex: frontLeft=>v1 and d1
+                frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + (distance * positiveNegative(v1)));
+                frontRight.setTargetPosition(frontRight.getCurrentPosition() + (distance * positiveNegative(v2)));
+                backLeft.setTargetPosition(backLeft.getCurrentPosition() + (distance * positiveNegative(v3)));
+                backRight.setTargetPosition(backRight.getCurrentPosition() + (distance * positiveNegative(v4)));
+
 
             frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -224,11 +234,12 @@ import org.firstinspires.ftc.teamcode.hMap;
                 telemetry.addData("v2",v2);
                 telemetry.addData("v3",v3);
                 telemetry.addData("v4",v4);
-
+/*
                 telemetry.addData("d1",d1);
                 telemetry.addData("d2",d2);
                 telemetry.addData("d3",d3);
                 telemetry.addData("d4",d4);
+                */
 
                 telemetry.addData("frontLeft:", frontLeft.getPower());
                 telemetry.addData("frontRight:",frontRight.getPower());

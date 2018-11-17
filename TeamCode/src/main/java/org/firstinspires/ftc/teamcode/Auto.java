@@ -42,33 +42,34 @@ public class Auto extends LinearOpMode {
         composeTelemetry();
         robot.init(hardwareMap);
         setHeadingToZero();
-        robot.markerDispenser.setPosition(0.7);
+        robot.markerDispenser.setPosition(1);
 
-        //color_sensor = hardwareMap.colorSensor.get("color");
         waitForStart();
 
         //Start Auto
-        //color sensor
-        /*
-            String.format("red: ", color_sensor.red());
-            String.format("green: ", color_sensor.green());
-            String.format("blue: ", color_sensor.blue());
-        */
 
-        LiftUp(-1, -40000);
-        RotateDistance(-0.3, -1000);
-        //DriveForwardDistance(0.5, 4000);
+        //LiftUp(-1, -40000);
+        VectorDistance(0.3,3000,180,0);
+        sleep(300);
+        VectorDistance(0.3,3000,0,0);
+        /*
+        sleep(300);
+        VectorDistance(0.7, 1000, 270,0);
+        robot.markerDispenser.setPosition(0.5);
+        sleep(1000);
+        */
 
 
     }
 
-    //
+/*
     public void LiftUp(double power, int distance){
 
         //Restart Encoders
         //robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Start Target Position
+
         robot.lift.setTargetPosition(robot.lift.getCurrentPosition()+distance);
 
         //set RUN_TO_POSITION mode
@@ -87,6 +88,7 @@ public class Auto extends LinearOpMode {
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
+*/
 
     //Driving Power Functions
     public void DriveForward(double power){
@@ -150,29 +152,66 @@ public class Auto extends LinearOpMode {
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    void VectorDistance(double power, int distance, double angle){
+    int positiveNegative(double x){
+        int result=1;
+        if(x<0){
+            result=-1;
+        }
+        return result;
+    }
+
+    
+
+    //if rotationalPower, insert power:0 and directionalAngle:0
+    //power and rotational power between -1 and 1
+    void VectorDistance(double power, int distance, double directionalAngle, double rotationalPower){
+        double r = power;
+        double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
+        double rotateAngle = rotationalPower;
+        //calculate voltage for each motor
+        double v1 = r * Math.cos(robotAngle)+rotateAngle;
+        double v2 = r * Math.sin(robotAngle)-rotateAngle;
+        double v3 = r * Math.sin(robotAngle)+rotateAngle;
+        double v4 = r * Math.cos(robotAngle)-rotateAngle;
+
+        //calculate max power for each motor
+        /*
+        double vMax=v1;
+        double[] vArray={v2,v3,v4};
+        for(double voltage: vArray){
+            if(voltage>vMax){
+                vMax=voltage;
+            }
+        }
+        */
+        //unique motor distance= percentage(+/-) * distance
+            /*
+                int d1 = (int) (v1 / vMax) * distance;
+                int d2 = (int) (v2 / vMax) * distance;
+                int d3 = (int) (v3 / vMax) * distance;
+                int d4 = (int) (v4 / vMax) * distance;
+                */
+
+
         //reset encoders
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition()+distance);
-        robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition()+distance);
-        robot.frontRight.setTargetPosition(robot.frontRight.getCurrentPosition()-distance);
-        robot.backRight.setTargetPosition(robot.backRight.getCurrentPosition()-distance);
+        //check that motor(frontLeft,backLeft,frontRight,backRight) corresponds with voltage and unique motor distance
+        //MOTOR ORDER MATTERS
+        //ex: frontLeft=>v1 and d1
+        robot.frontLeft.setTargetPosition(robot.frontLeft.getCurrentPosition() + (distance * positiveNegative(v1)));
+        robot.frontRight.setTargetPosition(robot.frontRight.getCurrentPosition() + (distance * positiveNegative(v2)));
+        robot.backLeft.setTargetPosition(robot.backLeft.getCurrentPosition() + (distance * positiveNegative(v3)));
+        robot.backRight.setTargetPosition(robot.backRight.getCurrentPosition() + (distance * positiveNegative(v4)));
+
 
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        double r = power;
-        double robotAngle = Math.toRadians(angle) - Math.PI / 4;
-        double v1 = r * Math.cos(robotAngle);
-        double v2 = r * Math.sin(robotAngle);
-        double v3 = r * Math.sin(robotAngle);
-        double v4 = r * Math.cos(robotAngle);
 
         robot.frontLeft.setPower(v1);
         robot.frontRight.setPower(v2);
@@ -181,6 +220,23 @@ public class Auto extends LinearOpMode {
 
         while (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() && robot.backRight.isBusy()) {
             //wait until robot stops
+            telemetry.update();
+            telemetry.addData("v1",v1);
+            telemetry.addData("v2",v2);
+            telemetry.addData("v3",v3);
+            telemetry.addData("v4",v4);
+/*
+                telemetry.addData("d1",d1);
+                telemetry.addData("d2",d2);
+                telemetry.addData("d3",d3);
+                telemetry.addData("d4",d4);
+                */
+
+            telemetry.addData("frontLeft:", robot.frontLeft.getPower());
+            telemetry.addData("frontRight:",robot.frontRight.getPower());
+            telemetry.addData("backLeft:", robot.backLeft.getPower());
+            telemetry.addData("backRight:",robot.backRight.getPower());
+
         }
 
         StopDriving();

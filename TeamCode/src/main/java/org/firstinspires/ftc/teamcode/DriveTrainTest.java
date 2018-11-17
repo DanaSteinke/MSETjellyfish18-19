@@ -21,10 +21,10 @@ public class DriveTrainTest extends LinearOpMode {
     private DcMotor backRight;
 
     //Declare Servos
-    /*
+
     private CRServo intake;
-    private ColorSensor color_sensor;
-    */
+    //private ColorSensor color_sensor;
+
 
     //private CRServo intake;
 
@@ -35,12 +35,13 @@ public class DriveTrainTest extends LinearOpMode {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         //initialize Servos
-        /*
         intake = hardwareMap.crservo.get("intake");
-        color_sensor = hardwareMap.colorSensor.get("color_sensor");
-        */
+        //color_sensor = hardwareMap.colorSensor.get("color_sensor");
+
 
 
         //press start button
@@ -76,9 +77,14 @@ public class DriveTrainTest extends LinearOpMode {
 
 
          //Gamepad 2 Robot Controller
+            //tank drive
+            frontLeft.setPower(gamepad2.left_stick_y);
+            backLeft.setPower(gamepad2.left_stick_y);
+            frontRight.setPower(gamepad2.right_stick_y);
+            backRight.setPower(gamepad2.right_stick_y);
 
             //intake
-            /*
+/*
             if (gamepad2.a == true) {
                 //intake.setDirection(DcMotorSimple.Direction.FORWARD);
                 intake.setPower(1.0);
@@ -90,6 +96,7 @@ public class DriveTrainTest extends LinearOpMode {
                 telemetry.addData("intake power", gamepad2.right_stick_y);
             }
             */
+
 
 
             //color sensor
