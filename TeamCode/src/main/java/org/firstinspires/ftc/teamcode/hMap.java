@@ -38,22 +38,22 @@ public class hMap {
     HardwareMap hwMap;
 
 
-
+    //constructor
     hMap() {
     }
 
     public void init(HardwareMap ahwMap) {
-        hwMap = ahwMap;
-        frontLeft = hwMap.dcMotor.get("frontLeft");
-        frontRight = hwMap.dcMotor.get("frontRight");
-        backLeft = hwMap.dcMotor.get("backLeft");
-        backRight = hwMap.dcMotor.get("backRight");
+        this.hwMap = ahwMap;
+        frontLeft = this.hwMap.dcMotor.get("frontLeft");
+        frontRight = this.hwMap.dcMotor.get("frontRight");
+        backLeft = this.hwMap.dcMotor.get("backLeft");
+        backRight = this.hwMap.dcMotor.get("backRight");
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         //intake = hwMap.crservo.get("intake");
         //lift = hwMap.dcMotor.get("lift");
-        markerDispenser = hwMap.servo.get("markerDispenser");
+        markerDispenser = this.hwMap.servo.get("markerDispenser");
     }
 
     public void gyroInit() {

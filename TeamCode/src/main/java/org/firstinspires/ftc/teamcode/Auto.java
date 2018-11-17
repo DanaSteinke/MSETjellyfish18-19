@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import java.util.Locale;
 
+import java.util.concurrent.TimeUnit;
 import org.firstinspires.ftc.teamcode.hMap;
 
 /**
@@ -25,9 +26,11 @@ public class Auto extends LinearOpMode {
 
     //Declare Gyro
     double heading;
-    Orientation angles;
-    int run360=15000;
+    int run360=6950;
     int rev=1120;
+    long startTime=System.nanoTime();
+    long timeElapse;
+
 
 
     hMap robot = new hMap();
@@ -47,9 +50,12 @@ public class Auto extends LinearOpMode {
         waitForStart();
 
         //Start Auto
+            gyroToGo(90);
+
+
 
         //LiftUp(-1, -40000);
-        
+        /*
         VectorDistance(0.5,1500,90,0);
         sleep(300);
         VectorDistance(0.5,1500,180,0);
@@ -58,6 +64,7 @@ public class Auto extends LinearOpMode {
         sleep(300);
         VectorDistance(0.5,1500,0,0);
         sleep(3000);
+        */
 
 
         /*
@@ -226,17 +233,12 @@ public class Auto extends LinearOpMode {
 
         while (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() && robot.backRight.isBusy()) {
             //wait until robot stops
+
             telemetry.update();
             telemetry.addData("v1",v1);
             telemetry.addData("v2",v2);
             telemetry.addData("v3",v3);
             telemetry.addData("v4",v4);
-/*
-                telemetry.addData("d1",d1);
-                telemetry.addData("d2",d2);
-                telemetry.addData("d3",d3);
-                telemetry.addData("d4",d4);
-                */
 
             telemetry.addData("frontLeft:", robot.frontLeft.getPower());
             telemetry.addData("frontRight:",robot.frontRight.getPower());
@@ -309,9 +311,13 @@ public class Auto extends LinearOpMode {
     //position 1= degree is greater than left
     //position -1= degree is less than right
     RangeResult inRange(double angle, double offset) {
+        telemetry.addData("ExecutionTimeinMilliseconds",timeElapse/1000000);
         RangeResult range = new RangeResult();
         telemetry.update();
         double degree = heading;
+        if(degree<0) {
+            degree = degree + 360;
+        }
         //find distance from angle to degree
         range.distance = Math.abs(angle - degree);
         double right = angle - offset;
@@ -347,6 +353,7 @@ public class Auto extends LinearOpMode {
             }
         }
         //find shortest distance: if greater than 180 degrees, change direction and subtract distance by 180
+
         if (range.distance > 180) {
             range.distance = range.distance - 180;
             if (range.position == -1) {
@@ -355,33 +362,53 @@ public class Auto extends LinearOpMode {
                 range.position = -1;
             }
         }
+
+        telemetry.update();
+        telemetry.addData("target",angle);
+        telemetry.addData("inRangeheading",degree);
+        telemetry.addData("range.distance",range.distance);
+        if(range.position==1){
+            telemetry.addData("Turn Right-position:", range.position);
+        }else if(range.position==-1){
+            telemetry.addData("Turn Left-position:", range.position);
+        }
+        else{
+            telemetry.addData("Stop-position:",range.position);
+        }
         return range;
     }
 
     //turn left when -1
     //turn right when 1
     public void gyroToGo(double angle) throws InterruptedException {
-        double angleoffset = 4;
+        double angleoffset = 5;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
         int previousposition = rangeresult.position;
         double distance = rangeresult.distance;
-        double previouspower = 0.5;
+        double previouspower = 0.3;
         double powerlevel =0.5;
-        double k=0.7;
+        double k=0.3;
+
         while (true) {
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
             distance = rangeresult.distance;
 
-            //adjust power level
-            if (distance > 40) {
-                powerlevel = 0.5;
+            //adjust power level\
+
+            if (distance > 70) {
+                powerlevel = 0.7;
+            }
+            else if(distance>30){
+                powerlevel=0.5;
             }
             else{
-                powerlevel = 0.5;
+                powerlevel = 0.3;
             }
+
+
 
             //turn or stop
             if (position == 0) {
@@ -389,21 +416,29 @@ public class Auto extends LinearOpMode {
                 waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
+                    telemetry.update();
+                    telemetry.addData("Finished with gyro to go-position",rangeresult.position);
+                    telemetry.addData("distance:",rangeresult.distance);
+                    sleep(3000);
                     break;
                 }
                 //position is left of heading, rotate right
             } else if (position == 1) {
+
                 if (previouspower != powerlevel || previousposition != position) {
-                    int deg= Math.round((float) (run360/360)*(float)(distance));
-                    RotateDistance(powerlevel, deg);
+                    //int deg= Math.round((float) (run360/360)*(float)(distance));
+                    //RotateDistance(powerlevel, deg);
+                    rotateRight(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
                 }
                 //position is right of heading, rotate left
             } else if (position == -1) {
+
                 if (previouspower != powerlevel || previousposition != position) {
-                    int deg= Math.round((float) (run360/360)*(float)(distance));
-                    RotateDistance(-powerlevel, -deg);
+                    //int deg= Math.round((float) (run360/360)*(float)(distance));
+                    //RotateDistance(-powerlevel, -deg);
+                    rotateLeft(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
 
@@ -451,10 +486,9 @@ public class Auto extends LinearOpMode {
 
                         //heading is a string, so the below code makes it a long so it can actually be used
                         heading = Double.parseDouble(formatAngle(robot.angles.angleUnit, robot.angles.firstAngle));
-                        if (heading < 0) {
-                            heading = heading + 360;
-                        }
-
+                        long endTime=System.nanoTime();
+                        timeElapse=endTime-startTime;
+                        startTime=endTime;
                         return formatAngle(robot.angles.angleUnit, heading);
 
                     }
