@@ -31,11 +31,33 @@ public class DriveTrain extends LinearOpMode {
             double xValue=gamepad1.left_stick_x;
             double r = Math.hypot(xValue, yValue);
             double robotAngle = Math.atan2(yValue, xValue) - Math.PI / 4;
-            double rightX = gamepad1.right_stick_x;
-            double v1 = r * Math.cos(robotAngle) + rightX;
-            double v2 = r * Math.sin(robotAngle) - rightX;
-            double v3 = r * Math.sin(robotAngle) + rightX;
-            double v4 = r * Math.cos(robotAngle) - rightX;
+            double rotationalPower = gamepad1.right_stick_x;
+
+            //calculate direction of voltages to max value with sine cosine functions
+            //voltages are without magnitude(joystick) nor rotational Power yet
+            double v1 = Math.cos(robotAngle);
+            double v2 = Math.sin(robotAngle);
+            double v3 = Math.sin(robotAngle);
+            double v4 = Math.cos(robotAngle);
+
+            double vMax=0;
+            double[] vArray={v1,v2,v3,v4};
+            for(double voltage: vArray){
+                if(Math.abs(voltage)>vMax){
+                    vMax=Math.abs(voltage);
+                }
+            }
+            v1=v1/vMax;
+            v2=v2/vMax;
+            v3=v3/vMax;
+            v4=v4/vMax;
+
+            //voltages implemented with magnitude(joystick) and rotational Power
+            v1 = r * v1 + rotationalPower;
+            v2 = r * v2 - rotationalPower;
+            v3 = r * v3 + rotationalPower;
+            v4 = r * v4 - rotationalPower;
+
 
             robot.frontLeft.setPower(v1);
             robot.frontRight.setPower(v2);

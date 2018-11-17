@@ -49,9 +49,16 @@ public class Auto extends LinearOpMode {
         //Start Auto
 
         //LiftUp(-1, -40000);
-        VectorDistance(0.3,3000,180,0);
+        VectorDistance(0.5,1500,90,0);
         sleep(300);
-        VectorDistance(0.3,3000,0,0);
+        VectorDistance(0.5,1500,180,0);
+        sleep(300);
+        VectorDistance(0.5,1500,270,0);
+        sleep(300);
+        VectorDistance(0.5,1500,0,0);
+        sleep(3000);
+
+
         /*
         sleep(300);
         VectorDistance(0.7, 1000, 270,0);
@@ -160,7 +167,7 @@ public class Auto extends LinearOpMode {
         return result;
     }
 
-    
+
 
     //if rotationalPower, insert power:0 and directionalAngle:0
     //power and rotational power between -1 and 1
@@ -175,15 +182,18 @@ public class Auto extends LinearOpMode {
         double v4 = r * Math.cos(robotAngle)-rotateAngle;
 
         //calculate max power for each motor
-        /*
-        double vMax=v1;
-        double[] vArray={v2,v3,v4};
+        double vMax=0;
+        double[] vArray={v1,v2,v3,v4};
         for(double voltage: vArray){
-            if(voltage>vMax){
-                vMax=voltage;
+            if(Math.abs(voltage)>vMax){
+                vMax=Math.abs(voltage);
             }
         }
-        */
+        v1=v1/vMax;
+        v2=v2/vMax;
+        v3=v3/vMax;
+        v4=v4/vMax;
+
         //unique motor distance= percentage(+/-) * distance
             /*
                 int d1 = (int) (v1 / vMax) * distance;
