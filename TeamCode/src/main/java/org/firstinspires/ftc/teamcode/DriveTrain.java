@@ -35,6 +35,22 @@ public class DriveTrain extends LinearOpMode {
 
             //calculate direction of voltages to max value with sine cosine functions
             //voltages are without magnitude(joystick) nor rotational Power yet
+            double v1 = 2*r * Math.cos(robotAngle) + rotationalPower;
+            double v2 = 2*r *  Math.sin(robotAngle) - rotationalPower;
+            double v3 = 2*r *  Math.sin(robotAngle) + rotationalPower;
+            double v4 = 2*r * Math.cos(robotAngle) - rotationalPower;
+            double[] vArray={v1,v2,v3,v4};
+            for(int i=0; i<vArray.length; i++){
+                if(Math.abs(vArray[i])>1) {
+                    vArray[i]=positiveNegative(vArray[i]);
+                }
+            }
+            robot.frontLeft.setPower(vArray[0]);
+            robot.frontRight.setPower(vArray[1]);
+            robot.backLeft.setPower(vArray[2]);
+            robot.backRight.setPower(vArray[3]);
+
+            /*
             double v1 = Math.cos(robotAngle);
             double v2 = Math.sin(robotAngle);
             double v3 = Math.sin(robotAngle);
@@ -57,7 +73,7 @@ public class DriveTrain extends LinearOpMode {
             v2 = r * v2 - rotationalPower;
             v3 = r * v3 + rotationalPower;
             v4 = r * v4 - rotationalPower;
-
+*/
 
             robot.frontLeft.setPower(v1);
             robot.frontRight.setPower(v2);
@@ -89,6 +105,24 @@ public class DriveTrain extends LinearOpMode {
             //lift
             //robot.lift.setPower(gamepad2.left_stick_y);
             //marker disposer
+
+             yValue=-gamepad2.left_stick_y;
+             xValue=gamepad2.left_stick_x;
+             r = Math.hypot(xValue, yValue);
+             robotAngle = Math.atan2(yValue, xValue) - Math.PI / 4;
+             rotationalPower = gamepad1.right_stick_x;
+
+            //voltages implemented with magnitude(joystick) and rotational Power
+            v1 = r * Math.cos(robotAngle) + rotationalPower;
+            v2 = r *  Math.sin(robotAngle) - rotationalPower;
+            v3 = r *  Math.sin(robotAngle) + rotationalPower;
+            v4 = r * Math.cos(robotAngle) - rotationalPower;
+
+
+            robot.frontLeft.setPower(v1);
+            robot.frontRight.setPower(v2);
+            robot.backLeft.setPower(v3);
+            robot.backRight.setPower(v4);
             robot.markerDispenser.setPosition(gamepad2.right_stick_y);
             telemetry.addData("markerPosition:",robot.markerDispenser.getPosition());
 
@@ -110,6 +144,13 @@ public class DriveTrain extends LinearOpMode {
             idle();
         }
 
+    }
+    int positiveNegative(double x){
+        int result=1;
+        if(x<0){
+            result=-1;
+        }
+        return result;
     }
 /*
     public void LiftUp(double power, int position) {

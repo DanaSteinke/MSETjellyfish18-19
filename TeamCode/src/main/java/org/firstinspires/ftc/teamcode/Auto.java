@@ -49,6 +49,7 @@ public class Auto extends LinearOpMode {
         //Start Auto
 
         //LiftUp(-1, -40000);
+        
         VectorDistance(0.5,1500,90,0);
         sleep(300);
         VectorDistance(0.5,1500,180,0);
@@ -176,23 +177,18 @@ public class Auto extends LinearOpMode {
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
         double rotateAngle = rotationalPower;
         //calculate voltage for each motor
-        double v1 = r * Math.cos(robotAngle)+rotateAngle;
-        double v2 = r * Math.sin(robotAngle)-rotateAngle;
-        double v3 = r * Math.sin(robotAngle)+rotateAngle;
-        double v4 = r * Math.cos(robotAngle)-rotateAngle;
+        double v1 = 2*r * Math.cos(robotAngle)+rotateAngle;
+        double v2 = 2*r * Math.sin(robotAngle)-rotateAngle;
+        double v3 = 2*r * Math.sin(robotAngle)+rotateAngle;
+        double v4 = 2*r * Math.cos(robotAngle)-rotateAngle;
 
         //calculate max power for each motor
-        double vMax=0;
         double[] vArray={v1,v2,v3,v4};
-        for(double voltage: vArray){
-            if(Math.abs(voltage)>vMax){
-                vMax=Math.abs(voltage);
+        for(int i=0; i<vArray.length; i++){
+            if(Math.abs(vArray[i])>1) {
+                vArray[i]=positiveNegative(vArray[i]);
             }
         }
-        v1=v1/vMax;
-        v2=v2/vMax;
-        v3=v3/vMax;
-        v4=v4/vMax;
 
         //unique motor distance= percentage(+/-) * distance
             /*
@@ -223,10 +219,10 @@ public class Auto extends LinearOpMode {
         robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        robot.frontLeft.setPower(v1);
-        robot.frontRight.setPower(v2);
-        robot.backLeft.setPower(v3);
-        robot.backRight.setPower(v4);
+        robot.frontLeft.setPower(vArray[0]);
+        robot.frontRight.setPower(vArray[1]);
+        robot.backLeft.setPower(vArray[2]);
+        robot.backRight.setPower(vArray[3]);
 
         while (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() && robot.backRight.isBusy()) {
             //wait until robot stops
