@@ -50,26 +50,27 @@ public class Auto extends LinearOpMode {
         waitForStart();
 
         //Start Auto
-            gyroToGo(90);
 
+        LiftUp(-1, -2600);
 
-
-        //LiftUp(-1, -40000);
-        /*
+/*
+        gyroToGo(90);
+        gyroToGo(180);
+        gyroToGo(270);
+        gyroToGo(360);
         VectorDistance(0.5,1500,90,0);
-        sleep(300);
         VectorDistance(0.5,1500,180,0);
-        sleep(300);
         VectorDistance(0.5,1500,270,0);
-        sleep(300);
         VectorDistance(0.5,1500,0,0);
-        sleep(3000);
+        gyroToGo(90);
+        gyroToGo(180);
+        gyroToGo(270);
+        gyroToGo(360);
         */
 
 
+
         /*
-        sleep(300);
-        VectorDistance(0.7, 1000, 270,0);
         robot.markerDispenser.setPosition(0.5);
         sleep(1000);
         */
@@ -77,7 +78,7 @@ public class Auto extends LinearOpMode {
 
     }
 
-/*
+
     public void LiftUp(double power, int distance){
 
         //Restart Encoders
@@ -93,17 +94,18 @@ public class Auto extends LinearOpMode {
         robot.lift.setPower(power);
 
         while(robot.lift.isBusy()){
+            //wait until target position is reached
             telemetry.update();
             telemetry.addData("Lift Encoder Position", robot.lift.getCurrentPosition());
             telemetry.addData("get Target Position", robot.lift.getTargetPosition());
-            //wait until target position is reached
 
         }
         robot.lift.setPower(0.0);
+        sleep(300);
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
-*/
+
 
     //Driving Power Functions
     public void DriveForward(double power){
@@ -248,6 +250,7 @@ public class Auto extends LinearOpMode {
         }
 
         StopDriving();
+        sleep(300);
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -362,26 +365,13 @@ public class Auto extends LinearOpMode {
                 range.position = -1;
             }
         }
-
-        telemetry.update();
-        telemetry.addData("target",angle);
-        telemetry.addData("inRangeheading",degree);
-        telemetry.addData("range.distance",range.distance);
-        if(range.position==1){
-            telemetry.addData("Turn Right-position:", range.position);
-        }else if(range.position==-1){
-            telemetry.addData("Turn Left-position:", range.position);
-        }
-        else{
-            telemetry.addData("Stop-position:",range.position);
-        }
         return range;
     }
 
     //turn left when -1
     //turn right when 1
     public void gyroToGo(double angle) throws InterruptedException {
-        double angleoffset = 5;
+        double angleoffset = 3;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
         int previousposition = rangeresult.position;
@@ -404,8 +394,11 @@ public class Auto extends LinearOpMode {
             else if(distance>30){
                 powerlevel=0.5;
             }
+            else if(distance>20){
+                powerlevel=0.3;
+            }
             else{
-                powerlevel = 0.3;
+                powerlevel = 0.2;
             }
 
 
@@ -419,13 +412,12 @@ public class Auto extends LinearOpMode {
                     telemetry.update();
                     telemetry.addData("Finished with gyro to go-position",rangeresult.position);
                     telemetry.addData("distance:",rangeresult.distance);
-                    sleep(3000);
+                    sleep(1000);
                     break;
                 }
                 //position is left of heading, rotate right
             } else if (position == 1) {
-
-                if (previouspower != powerlevel || previousposition != position) {
+                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
                     //int deg= Math.round((float) (run360/360)*(float)(distance));
                     //RotateDistance(powerlevel, deg);
                     rotateRight(powerlevel);
@@ -434,8 +426,7 @@ public class Auto extends LinearOpMode {
                 }
                 //position is right of heading, rotate left
             } else if (position == -1) {
-
-                if (previouspower != powerlevel || previousposition != position) {
+                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
                     //int deg= Math.round((float) (run360/360)*(float)(distance));
                     //RotateDistance(-powerlevel, -deg);
                     rotateLeft(powerlevel);

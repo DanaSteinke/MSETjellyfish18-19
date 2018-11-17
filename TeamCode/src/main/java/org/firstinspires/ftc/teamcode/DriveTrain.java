@@ -24,7 +24,6 @@ public class DriveTrain extends LinearOpMode {
         //while running, before pressing stop button
         while (opModeIsActive()) {
         //Gamepad 1 Drive Train Controller
-            //tank drive
             //field centric drive
             //because of joystick positions, change yValue to reverse, then Quadrants will be in position
             double yValue=-gamepad1.left_stick_y;
@@ -91,39 +90,16 @@ public class DriveTrain extends LinearOpMode {
             telemetry.addData("PbackLeft:", robot.backLeft.getPower());
             telemetry.addData("PbackRight:", robot.backRight.getPower());
 
-            //Motor Encoder Positions
-            /*
-            telemetry.addData("Encoder Position", frontLeft.getCurrentPosition());
-            telemetry.addData("Power", frontLeft.getPower());
-            telemetry.addData("Lift Encoder Position", lift.getCurrentPosition());
-            telemetry.addData("Lift Power ", lift.getPower());
-            telemetry.update();
-            */
-
 
          //Gamepad 2 Robot Controller
             //lift
-            //robot.lift.setPower(gamepad2.left_stick_y);
+            robot.lift.setPower(gamepad2.left_stick_y);
+            telemetry.update();
+            telemetry.addData("Lift Encoder Position", robot.lift.getCurrentPosition());
+            telemetry.addData("Lift Power ", robot.lift.getPower());
+
             //marker disposer
-
-             yValue=-gamepad2.left_stick_y;
-             xValue=gamepad2.left_stick_x;
-             r = Math.hypot(xValue, yValue);
-             robotAngle = Math.atan2(yValue, xValue) - Math.PI / 4;
-             rotationalPower = gamepad1.right_stick_x;
-
-            //voltages implemented with magnitude(joystick) and rotational Power
-            v1 = r * Math.cos(robotAngle) + rotationalPower;
-            v2 = r *  Math.sin(robotAngle) - rotationalPower;
-            v3 = r *  Math.sin(robotAngle) + rotationalPower;
-            v4 = r * Math.cos(robotAngle) - rotationalPower;
-
-
-            robot.frontLeft.setPower(v1);
-            robot.frontRight.setPower(v2);
-            robot.backLeft.setPower(v3);
-            robot.backRight.setPower(v4);
-            robot.markerDispenser.setPosition(gamepad2.right_stick_y);
+            robot.markerDispenser.setPosition(1);
             telemetry.addData("markerPosition:",robot.markerDispenser.getPosition());
 
 
@@ -152,27 +128,5 @@ public class DriveTrain extends LinearOpMode {
         }
         return result;
     }
-/*
-    public void LiftUp(double power, int position) {
-
-        //Restart Encoders
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        //Start Target Position
-        lift.setTargetPosition(position);
-
-        //set RUN_TO_POSITION mode
-        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift.setPower(power);
-        while (lift.isBusy()) {
-
-            //wait until target position is reached
-
-        }
-        lift.setPower(0.0);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    }
-    */
 }
 
