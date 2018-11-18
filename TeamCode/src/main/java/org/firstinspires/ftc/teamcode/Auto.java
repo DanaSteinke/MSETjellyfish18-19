@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import java.util.Locale;
 
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import org.firstinspires.ftc.teamcode.hMap;
 
@@ -45,13 +46,22 @@ public class Auto extends LinearOpMode {
         composeTelemetry();
         robot.init(hardwareMap);
         setHeadingToZero();
+
+        //robot sets markerDispenser upright
+        //set intake arm power to 0
         robot.markerDispenser.setPosition(1);
 
         waitForStart();
 
         //Start Auto
+        ExtendingLift();
+        VectorDistance(0.5,1000,180,0);
+        VectorDistance(0.5,6000,270,0);
+        gyroToGo(180);
+        robot.markerDispenser.setPosition(0.5);
 
-        LiftUp(-1, -2600);
+        //DetractLift();
+
 
 /*
         gyroToGo(90);
@@ -79,7 +89,7 @@ public class Auto extends LinearOpMode {
     }
 
 
-    public void LiftUp(double power, int distance){
+    public void EncoderDetractLift(double power, int distance){
 
         //Restart Encoders
         //robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -290,8 +300,8 @@ public class Auto extends LinearOpMode {
     }
 
 
-
-    //Gyro
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //GYRO
     public void waitUntilStable() throws InterruptedException {
         telemetry.update();
         double degree = heading;
@@ -506,6 +516,29 @@ public class Auto extends LinearOpMode {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //MAGNETIC LIMIT SWITCH(TOUCH SENSOR)
+    public void ExtendingLift(){
+        EncoderDetractLift(-1,-5000);
+        while(!robot.topLimit.isPressed() && opModeIsActive()){
+            //if top limit switch is not pressed, go up
+            robot.lift.setPower(-1);
+        }
+        robot.lift.setPower(0.0);
+     sleep(300);
+    }
+    public void DetractLift(){
+        EncoderDetractLift(1,1000);
+        while(!robot.topLimit.isPressed() && opModeIsActive()){
+            //if top limit switch is not pressed, go up
+            robot.lift.setPower(1);
+        }
+        robot.lift.setPower(0.0);
+        sleep(300);
+    }
+
+
+
+
     /*
     void colorSense(double power){
         DriveForward(power);

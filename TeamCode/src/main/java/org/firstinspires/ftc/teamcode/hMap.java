@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -21,11 +23,14 @@ public class hMap {
     public DcMotor backLeft;
     public DcMotor backRight;
     public DcMotor lift;
+    public DcMotor intakeArm;
 
     //Declare servos
-    //public CRServo intake;
+    public CRServo intake;
     public Servo markerDispenser;
 
+    //Declare Sensors
+    public TouchSensor topLimit;
 
     // The IMU sensor object
     public BNO055IMU imu;
@@ -52,10 +57,15 @@ public class hMap {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         lift = hwMap.dcMotor.get("lift");
+        intakeArm =hwMap.dcMotor.get("intakeArm");
 
         //initialize servos
-        //intake = hwMap.crservo.get("intake");
+        intake = hwMap.crservo.get("intake");
         markerDispenser = this.hwMap.servo.get("markerDispenser");
+
+        //initialize sensors
+        topLimit= this.hwMap.touchSensor.get("topLimit");
+
     }
 
     public void gyroInit() {
