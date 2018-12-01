@@ -44,16 +44,16 @@ public class DriveTrain extends LinearOpMode {
             telemetry.update();
             telemetry.addData("right_bumper",gamepad1.right_bumper);
             if(gamepad1.right_bumper==true) {
-                robot.frontLeft.setPower(vArray[0] * 0.25);
-                robot.frontRight.setPower(vArray[1] * 0.25);
-                robot.backLeft.setPower(vArray[2] * 0.25);
-                robot.backRight.setPower(vArray[3] * 0.25);
+                robot.frontLeft.setPower(v1 * 0.35);
+                robot.frontRight.setPower(v2 * 0.35);
+                robot.backLeft.setPower(v3 * 0.35);
+                robot.backRight.setPower(v4 * 0.35);
             }
             else{
-                robot.frontLeft.setPower(vArray[0]);
-                robot.frontRight.setPower(vArray[1]);
-                robot.backLeft.setPower(vArray[2]);
-                robot.backRight.setPower(vArray[3]);
+                robot.frontLeft.setPower(v1);
+                robot.frontRight.setPower(v2);
+                robot.backLeft.setPower(v3);
+                robot.backRight.setPower(v4);
             }
 
             /*
