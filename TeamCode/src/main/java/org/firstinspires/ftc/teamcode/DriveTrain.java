@@ -26,8 +26,8 @@ public class DriveTrain extends LinearOpMode {
         //Gamepad 1 Drive Train Controller
             //field centric drive
             //because of joystick positions, change yValue to reverse, then Quadrants will be in position
-            //for Jae purposes . . .
-            double yValue=gamepad1.left_stick_y;
+            //for Jae purposes . . . not right now
+            double yValue=-gamepad1.left_stick_y;
             double xValue=gamepad1.left_stick_x;
             double r = Math.hypot(xValue, yValue);
             double robotAngle = Math.atan2(yValue, xValue) - Math.PI / 4;
