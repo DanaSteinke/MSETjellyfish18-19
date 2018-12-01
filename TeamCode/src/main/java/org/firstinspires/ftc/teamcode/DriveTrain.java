@@ -35,16 +35,12 @@ public class DriveTrain extends LinearOpMode {
 
             //calculate direction of voltages to max value with sine cosine functions
             //voltages are without magnitude(joystick) nor rotational Power yet
-            double v1 = 2*r * Math.cos(robotAngle) + rotationalPower;
-            double v2 = 2*r *  Math.sin(robotAngle) - rotationalPower;
-            double v3 = 2*r *  Math.sin(robotAngle) + rotationalPower;
-            double v4 = 2*r * Math.cos(robotAngle) - rotationalPower;
+            double v1 = r * Math.cos(robotAngle) + rotationalPower;
+            double v2 = r *  Math.sin(robotAngle) - rotationalPower;
+            double v3 = r *  Math.sin(robotAngle) + rotationalPower;
+            double v4 = r * Math.cos(robotAngle) - rotationalPower;
             double[] vArray={v1,v2,v3,v4};
-            for(int i=0; i<vArray.length; i++){
-                if(Math.abs(vArray[i])>1) {
-                    vArray[i]=positiveNegative(vArray[i]);
-                }
-            }
+
             telemetry.update();
             telemetry.addData("right_bumper",gamepad1.right_bumper);
             if(gamepad1.right_bumper==true) {
@@ -139,7 +135,8 @@ public class DriveTrain extends LinearOpMode {
                 robot.intake.setPower(0.0);
             }
 
-
+            //marker dispenser
+            robot.markerDispenser.setPosition(1);
 
             //wait for hardware to catch up
             idle();

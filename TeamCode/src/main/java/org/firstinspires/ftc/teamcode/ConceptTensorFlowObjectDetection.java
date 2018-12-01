@@ -70,7 +70,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+    private static final String VUFORIA_KEY = "AUjsW+H/////AAABmXB2XjwfHEnDhy/Idc9HdAtRsEST28Ud+YihdDWTyArZbjGXPwIaGmsDPB3hOR5ZAHpq1p4ZB1+tSmeG0aKwUfOwq/MV3KtnDRSbUKuU+0h60aVoYVYq8CIHnTaGJ/9K8BZkpdExB5MC0wLLWhgJd6oKl+y1LkvoqdJRi1PP89yd1PTSHoDDLs5Q1lb4DhWbvsAlUBoR1Rqx695sGP/3AL1votRdmb0PsbZt5FJUUHETZ3j++5MBbiiaUjY9Ufltq4coHSPFLnaFN8aIWhSmmUI/mzxZ4SofOEasnwygFYE/kC/txlyqjYIY2ofCkbgVhV7Vqpm5Gxmm0YEGiaZYRpalU6zHfucJWjbcBYSNwZHo ";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -155,10 +155,11 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CameraDirection.BACK;
+        parameters.useExtendedTracking = false;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -172,9 +173,15 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        //TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters();
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.6;
+        tfodParameters.minimumConfidence = 0.8;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 }
+
+
+
+
+

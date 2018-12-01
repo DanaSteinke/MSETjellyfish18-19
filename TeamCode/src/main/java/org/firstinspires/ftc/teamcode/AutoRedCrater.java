@@ -56,7 +56,7 @@ import org.firstinspires.ftc.teamcode.hMap;
             waitForStart();
 
             //Start Auto
-            ExtendingLift();
+            //ExtendingLift();
             VectorDistance(0.5,1000,180,0);
             VectorDistance(0.5,3000,270,0);
 

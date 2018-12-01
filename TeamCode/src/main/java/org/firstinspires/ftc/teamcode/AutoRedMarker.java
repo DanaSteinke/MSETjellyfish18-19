@@ -55,7 +55,7 @@ import org.firstinspires.ftc.teamcode.hMap;
             waitForStart();
 
             //Start Auto
-            ExtendingLift();
+            //ExtendingLift();
             VectorDistance(0.5,1000,180,0);
             gyroToGo(0);
             VectorDistance(0.5,4800,270,0);
@@ -64,7 +64,8 @@ import org.firstinspires.ftc.teamcode.hMap;
             sleep(300);
             gyroToGo(220);
             //VectorDistance(0,-700,0,-0.5);
-            VectorDistance(1,7000,270,0);
+            VectorDistance(1,8000,270,0);
+            robot.markerDispenser.setPosition(1);
 
             //DetractLift();
 
