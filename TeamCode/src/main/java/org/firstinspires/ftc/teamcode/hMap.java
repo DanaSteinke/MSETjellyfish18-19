@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  */
 
 public class hMap {
-    //Declare motors
+    //Declare DriveBase
     public DcMotor frontLeft;
     public DcMotor frontRight;
     public DcMotor backLeft;

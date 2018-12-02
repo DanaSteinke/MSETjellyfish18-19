@@ -330,9 +330,9 @@ import org.firstinspires.ftc.teamcode.hMap;
         //position 0= in range
         //position 1= degree is greater than left
         //position -1= degree is less than right
-        org.firstinspires.ftc.teamcode.Auto.RangeResult inRange(double angle, double offset) {
+        RangeResult inRange(double angle, double offset) {
             telemetry.addData("ExecutionTimeinMilliseconds",timeElapse/1000000);
-            org.firstinspires.ftc.teamcode.Auto.RangeResult range = new org.firstinspires.ftc.teamcode.Auto.RangeResult();
+            RangeResult range = new RangeResult();
             telemetry.update();
             double degree = heading;
             if(degree<0) {
@@ -389,7 +389,7 @@ import org.firstinspires.ftc.teamcode.hMap;
         //turn right when 1
         public void gyroToGo(double angle) throws InterruptedException {
             double angleoffset = 5;
-            org.firstinspires.ftc.teamcode.Auto.RangeResult rangeresult = inRange(angle, angleoffset);
+            RangeResult rangeresult = inRange(angle, angleoffset);
             int position = rangeresult.position;
             int previousposition = rangeresult.position;
             double distance = rangeresult.distance;
