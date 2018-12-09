@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class DriveTrain extends LinearOpMode {
     hMap robot = new hMap();
 
-
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);

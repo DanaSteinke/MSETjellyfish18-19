@@ -174,9 +174,53 @@ public class DriveBase{
         RangeResult rangeResult5 = inRange(directionalAngle, 5);
         RangeResult rangeResult15 = inRange(directionalAngle,15);
         RangeResult rangeResult30 = inRange(directionalAngle, 30);
+        double k = 0.5;
+
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
+            if(rangeResult5.position != 0){
+                if(rangeResult5.position == 1){
+                    k = 0.15;
+                }
+                //rangeResult5 position == 0
+                else{
+                    k = -0.15;
+                }
+            } else if(rangeResult15.position != 0){
+                k = 0.5;
+                if(rangeResult15.position == 1){
+                    k = 0.35;
+                }
+                else{
+                    k = -0.35;
+                }
+            } else if(rangeResult30.position != 0){
+                if(rangeResult5.position == 1){
+                    k = 1;
+                }
+                else{
+                    k = -1;
+                }
+            }
+            //position = 0
+            else{
+                k = 0;
+            }
+            v1 = r * Math.cos(robotAngle);
+            v2 = r * Math.sin(robotAngle);
+            v3 = r * Math.sin(robotAngle);
+            v4 = r * Math.cos(robotAngle);
 
+            frontLeft.setPower(v1+k);
+            frontRight.setPower(v2-k);
+            backLeft.setPower(v3+k);
+            backRight.setPower(v4-k);
+
+
+
+            rangeResult5 = inRange(directionalAngle, 5);
+            rangeResult15 = inRange(directionalAngle,15);
+            rangeResult30 = inRange(directionalAngle, 30);
 
 
             /*
