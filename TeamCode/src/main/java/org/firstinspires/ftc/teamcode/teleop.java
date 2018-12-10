@@ -9,11 +9,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class teleop extends LinearOpMode{
     //public Robot robot;
     public CRServo intake;
-    HardwareMap hardwareMap;
+    HardwareMap hwMap;
 
-    teleop(){
-
-    }
     public void runOpMode() throws InterruptedException{
         //robot = new Robot(this);
         init(hardwareMap);
@@ -58,8 +55,8 @@ public class teleop extends LinearOpMode{
 
         }
     }
-    public void init(HardwareMap hwMap){
-        this.hardwareMap = hwMap;
-        intake = this.hardwareMap.crservo.get("intake");
+    public void init(HardwareMap ahwMap){
+        this.hwMap = ahwMap;
+        intake = this.hwMap.crservo.get("intake");
     }
 }
