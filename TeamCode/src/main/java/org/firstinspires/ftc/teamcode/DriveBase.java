@@ -126,6 +126,9 @@ public class DriveBase{
     //if rotationalPower, insert power:0 and directionalAngle:0
     //power and rotational power between -1 and 1
     void VectorDistance(double power, int distance, double directionalAngle){
+        //match gyro direction
+        directionalAngle -= 90;
+
         double r = power;
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
         //calculate voltage for each motor
@@ -171,56 +174,28 @@ public class DriveBase{
 
 
         //tune for Vector Distance
-        RangeResult rangeResult5 = inRange(directionalAngle, 5);
-        RangeResult rangeResult15 = inRange(directionalAngle,15);
-        RangeResult rangeResult30 = inRange(directionalAngle, 30);
-        double k = 0.5;
+        RangeResult rangeResult10 = inRange(directionalAngle, 10);
 
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
-            if(rangeResult5.position != 0){
-                if(rangeResult5.position == 1){
-                    k = 0.15;
-                }
-                //rangeResult5 position == 0
-                else{
-                    k = -0.15;
-                }
-            } else if(rangeResult15.position != 0){
-                k = 0.5;
-                if(rangeResult15.position == 1){
-                    k = 0.35;
-                }
-                else{
-                    k = -0.35;
-                }
-            } else if(rangeResult30.position != 0){
-                if(rangeResult5.position == 1){
-                    k = 1;
-                }
-                else{
-                    k = -1;
-                }
+            /*
+            if(rangeResult10.position != 0){
+                gyroToGo(directionalAngle, 10);
             }
-            //position = 0
-            else{
-                k = 0;
-            }
+
             v1 = r * Math.cos(robotAngle);
             v2 = r * Math.sin(robotAngle);
             v3 = r * Math.sin(robotAngle);
             v4 = r * Math.cos(robotAngle);
 
-            frontLeft.setPower(v1+k);
-            frontRight.setPower(v2-k);
-            backLeft.setPower(v3+k);
-            backRight.setPower(v4-k);
+            frontLeft.setPower(v1);
+            frontRight.setPower(v2);
+            backLeft.setPower(v3);
+            backRight.setPower(v4);
+            */
 
 
-
-            rangeResult5 = inRange(directionalAngle, 5);
-            rangeResult15 = inRange(directionalAngle,15);
-            rangeResult30 = inRange(directionalAngle, 30);
+            rangeResult10 = inRange(directionalAngle, 10);
 
 
             /*
@@ -229,12 +204,18 @@ public class DriveBase{
             opMode.telemetry.addData("v2",v2);
             opMode.telemetry.addData("v3",v3);
             opMode.telemetry.addData("v4",v4);
-
-            opMode.telemetry.addData("frontLeft:", frontLeft.getPower());
-            opMode.telemetry.addData("frontRight:",frontRight.getPower());
-            opMode.telemetry.addData("backLeft:", backLeft.getPower());
-            opMode.telemetry.addData("backRight:",backRight.getPower());
             */
+            opMode.telemetry.update();
+
+            opMode.telemetry.addData("frontLeftP:", frontLeft.getPower());
+            opMode.telemetry.addData("frontRightP:",frontRight.getPower());
+            opMode.telemetry.addData("backLeftP:", backLeft.getPower());
+            opMode.telemetry.addData("backRight:",backRight.getPower());
+
+            opMode.telemetry.addData("frontLeftP:", frontLeft.getCurrentPosition());
+            opMode.telemetry.addData("frontRightP:",frontRight.getCurrentPosition());
+            opMode.telemetry.addData("backLeftP:", backLeft.getCurrentPosition());
+            opMode.telemetry.addData("backRightP:",backRight.getCurrentPosition());
 
         }
 
@@ -391,7 +372,63 @@ public class DriveBase{
                     opMode.telemetry.update();
                     opMode.telemetry.addData("Finished with gyro to go-position",rangeresult.position);
                     opMode.telemetry.addData("distance:",rangeresult.distance);
-                    opMode.sleep(1000);
+                    opMode.sleep(300);
+                    break;
+                }
+                //position is left of heading, rotate right
+            } else if (position == 1) {
+                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
+                    //int deg= Math.round((float) (run360/360)*(float)(distance));
+                    //RotateDistance(powerlevel, deg);
+                    rotateRight(powerlevel);
+                    previousposition = position;
+                    previouspower = powerlevel;
+                }
+                //position is right of heading, rotate left
+            } else if (position == -1) {
+                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
+                    //int deg= Math.round((float) (run360/360)*(float)(distance));
+                    //RotateDistance(-powerlevel, -deg);
+                    rotateLeft(powerlevel);
+                    previousposition = position;
+                    previouspower = powerlevel;
+
+                }
+            }
+        }
+    }
+
+    public void gyroToGo(double angle, double offset) {
+        double angleoffset = offset;
+        RangeResult rangeresult = inRange(angle, angleoffset);
+        int position = rangeresult.position;
+        int previousposition = rangeresult.position;
+        double distance = rangeresult.distance;
+        double previouspower = 0.3;
+        double powerlevel =0.5;
+        double k=0.3;
+
+        while (opMode.opModeIsActive()) {
+            opMode.telemetry.update();
+            opMode.telemetry.addData("distance",rangeresult.distance);
+            opMode.telemetry.addData("powerlevel",powerlevel);
+            //update rangeresult
+            rangeresult = inRange(angle, angleoffset);
+            position = rangeresult.position;
+            distance = rangeresult.distance;
+
+            //adjust power level\
+            powerlevel=0.3;
+
+            //turn or stop
+            if (position == 0) {
+                StopDriving();
+                rangeresult = inRange(angle, angleoffset);
+                if (rangeresult.position == 0) {
+                    opMode.telemetry.update();
+                    opMode.telemetry.addData("Finished with gyro to go-position",rangeresult.position);
+                    opMode.telemetry.addData("distance:",rangeresult.distance);
+                    opMode.sleep(300);
                     break;
                 }
                 //position is left of heading, rotate right

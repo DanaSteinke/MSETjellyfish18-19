@@ -7,22 +7,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @TeleOp(name = "teleop")
 public class teleop extends LinearOpMode{
-    //public Robot robot;
+    public Robot robot;
     public CRServo intake;
     HardwareMap hwMap;
 
     public void runOpMode() throws InterruptedException{
-        //robot = new Robot(this);
-        init(hardwareMap);
+        robot = new Robot(this);
+        //init(hardwareMap);
 
         waitForStart();
         while(opModeIsActive()){
-            intake.setPower(-gamepad2.right_stick_y);
+            //intake.setPower(-gamepad2.right_stick_y);
             //Gamepad 1 Drive Train Controller
             //field centric drive
             //because of joystick positions, change yValue to reverse, then Quadrants will be in position
             //for Jae purposes . . . not right now
-            /*
+
             double yValue=-gamepad1.left_stick_y;
             double xValue=gamepad1.left_stick_x;
             double r = Math.hypot(xValue, yValue);
@@ -51,12 +51,14 @@ public class teleop extends LinearOpMode{
                 robot.driveBase.backLeft.setPower(v3);
                 robot.driveBase.backRight.setPower(v4);
             }
-            */
+
 
         }
     }
+    /*
     public void init(HardwareMap ahwMap){
         this.hwMap = ahwMap;
-        intake = this.hwMap.crservo.get("intake");
+        //intake = this.hwMap.crservo.get("intake");
     }
+    */
 }
