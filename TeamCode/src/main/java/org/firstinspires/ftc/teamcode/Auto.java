@@ -31,19 +31,26 @@ public class Auto extends LinearOpMode {
         robot = new Robot(this);
         robot.driveBase.composeTelemetry();
         robot.driveBase.setHeadingToZero();
+        robot.markerDispenser.setPosition(1);
 
 
         waitForStart();
 
         //Start Auto
-        robot.driveBase.VectorDistance(0.5,2000,90);
-        robot.driveBase.VectorDistance(0.5,2000, 180);
-        robot.driveBase.VectorDistance(0.5, 2000, 270);
-        robot.driveBase.VectorDistance(0.5, 2000, 0);
+
+
+        robot.driveBase.VectorDistance(0.8,2000,0);
+        robot.driveBase.VectorDistance(0.8,2000, 90);
+        robot.driveBase.VectorDistance(0.8, 2000, 180);
+        robot.driveBase.VectorDistance(0.8, 2000, 270);
+        robot.driveBase.gyroToGo(0);
         robot.driveBase.gyroToGo(90);
         robot.driveBase.gyroToGo(180);
         robot.driveBase.gyroToGo(270);
-        robot.driveBase.gyroToGo(0);
+        robot.markerDispenser.setPosition(0.5);
+
+        sleep(700);
+
 
 
 
