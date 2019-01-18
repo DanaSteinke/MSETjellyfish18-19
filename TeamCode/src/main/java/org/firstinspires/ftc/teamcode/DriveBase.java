@@ -200,10 +200,11 @@ public class DriveBase {
 
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
-
             /*
+
             if(rangeResult10.position != 0){
                 gyroToGo(directionalAngle, 10);
+
             }
 
             v1 = r * Math.cos(robotAngle);
@@ -219,15 +220,15 @@ public class DriveBase {
 
 
             rangeResult10 = inRange(directionalAngle, 10);
+
             */
 
-            /*
             opMode.telemetry.update();
             opMode.telemetry.addData("v1",v1);
             opMode.telemetry.addData("v2",v2);
             opMode.telemetry.addData("v3",v3);
             opMode.telemetry.addData("v4",v4);
-            */
+
             opMode.telemetry.update();
 
             opMode.telemetry.addData("frontLeftP:", frontLeft.getPower());
@@ -312,9 +313,11 @@ public class DriveBase {
         RangeResult range = new RangeResult();
         opMode.telemetry.update();
         double degree = heading;
+
         if (degree < 0) {
             degree = degree + 360;
         }
+
         //find distance from angle to degree
         range.distance = Math.abs(angle - degree);
         double right = angle - offset;
@@ -368,16 +371,18 @@ public class DriveBase {
         double angleoffset = 5;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
-        int previousposition = rangeresult.position;
+        int previousposition = -10;
         double distance = rangeresult.distance;
         double previouspower = 0.3;
         double powerlevel = 0.5;
         double k = 0.3;
-
+        int count = 0;
         while (opMode.opModeIsActive()) {
             opMode.telemetry.update();
             opMode.telemetry.addData("distance", rangeresult.distance);
             opMode.telemetry.addData("powerlevel", powerlevel);
+            opMode.telemetry.addData("position", rangeresult.position);
+            opMode.telemetry.addData("countTurn", count);
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
@@ -394,34 +399,35 @@ public class DriveBase {
                 if (rangeresult.position == 0) {
                     opMode.telemetry.update();
                     opMode.telemetry.addData("Finished with gyro to go-position", rangeresult.position);
-                    opMode.telemetry.addData("distance:", rangeresult.distance);
+                    opMode.telemetry.addData("position:", rangeresult.position);
                     opMode.sleep(300);
                     break;
                 }
                 //position is left of heading, rotate right
             } else if (position == 1) {
-                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
+                if ((previouspower != powerlevel || previousposition != position)) {
                     //int deg= Math.round((float) (run360/360)*(float)(distance));
                     //RotateDistance(powerlevel, deg);
                     rotateRight(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
+                    count++;
                 }
                 //position is right of heading, rotate left
             } else if (position == -1) {
-                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
+                if (previouspower != powerlevel || previousposition != position) {
                     //int deg= Math.round((float) (run360/360)*(float)(distance));
                     //RotateDistance(-powerlevel, -deg);
                     rotateLeft(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
-
+                    count++;
                 }
             }
         }
     }
 
-    public void gyroToGo(double angle, double offset) {
+    public void gyroToGo(double angle, double offset) throws InterruptedException{
         double angleoffset = offset;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
@@ -446,6 +452,7 @@ public class DriveBase {
             //turn or stop
             if (position == 0) {
                 StopDriving();
+                //waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
                     opMode.telemetry.update();
@@ -457,8 +464,6 @@ public class DriveBase {
                 //position is left of heading, rotate right
             } else if (position == 1) {
                 if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
-                    //int deg= Math.round((float) (run360/360)*(float)(distance));
-                    //RotateDistance(powerlevel, deg);
                     rotateRight(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
@@ -466,8 +471,6 @@ public class DriveBase {
                 //position is right of heading, rotate left
             } else if (position == -1) {
                 if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
-                    //int deg= Math.round((float) (run360/360)*(float)(distance));
-                    //RotateDistance(-powerlevel, -deg);
                     rotateLeft(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
@@ -517,6 +520,7 @@ public class DriveBase {
 
                         //heading is a string, so the below code makes it a long so it can actually be used
                         heading = Double.parseDouble(formatAngle(angles.angleUnit, angles.firstAngle));
+
                         long endTime = System.nanoTime();
                         timeElapse = endTime - startTime;
                         startTime = endTime;
@@ -556,5 +560,30 @@ public class DriveBase {
 
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        //The REV Expansion hub is mounted vertically, so we have to flip the y and z axes.
+        byte AXIS_MAP_CONFIG_BYTE = 0x18;
+        byte AXIS_MAP_SIGN_BYTE = 0x1;
+
+        imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
+        /*
+        try {
+            Thread.sleep(100);
+        }catch(InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+        */
+        imu.write8(BNO055IMU.Register.AXIS_MAP_CONFIG,AXIS_MAP_CONFIG_BYTE & 0x0F);
+        imu.write8(BNO055IMU.Register.AXIS_MAP_SIGN,AXIS_MAP_SIGN_BYTE & 0x0F);
+        imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.IMU.bVal & 0x0F);
+        /*
+        try {
+            Thread.sleep(100);
+        }catch(InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+        */
     }
 }

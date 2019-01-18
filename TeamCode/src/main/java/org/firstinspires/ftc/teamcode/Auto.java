@@ -40,9 +40,11 @@ public class Auto extends LinearOpMode {
 
 
         robot.driveBase.VectorDistance(0.8,2000,0);
-        robot.driveBase.VectorDistance(0.8,2000, 90);
-        robot.driveBase.VectorDistance(0.8, 2000, 180);
-        robot.driveBase.VectorDistance(0.8, 2000, 270);
+        robot.driveBase.VectorDistance(0.8,2000,90);
+        robot.driveBase.VectorDistance(0.8,2000,180);
+        robot.driveBase.VectorDistance(0.8,2000,270);
+
+
         robot.driveBase.gyroToGo(0);
         robot.driveBase.gyroToGo(90);
         robot.driveBase.gyroToGo(180);
