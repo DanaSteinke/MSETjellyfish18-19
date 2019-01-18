@@ -38,13 +38,11 @@ public class teleop extends LinearOpMode{
             double v3 = r *  Math.sin(robotAngle) + rotationalPower;
             double v4 = r * Math.cos(robotAngle) - rotationalPower;
 
-            telemetry.update();
-            telemetry.addData("right_bumper",gamepad1.right_bumper);
             if(gamepad1.right_bumper==true) {
-                robot.driveBase.frontLeft.setPower(v1 * 0.35);
-                robot.driveBase.frontRight.setPower(v2 * 0.35);
-                robot.driveBase.backLeft.setPower(v3 * 0.35);
-                robot.driveBase.backRight.setPower(v4 * 0.35);
+                robot.driveBase.frontLeft.setPower(v1 * 0.4);
+                robot.driveBase.frontRight.setPower(v2 * 0.4);
+                robot.driveBase.backLeft.setPower(v3 * 0.4);
+                robot.driveBase.backRight.setPower(v4 * 0.4);
             }
             else{
                 robot.driveBase.frontLeft.setPower(v1);
@@ -54,8 +52,41 @@ public class teleop extends LinearOpMode{
             }
 
          //GAMEPAD 2
-            robot.Lift.lift.setPower(gamepad2.right_stick_y*0.5);
-            robot.markerDispenser.setPosition(gamepad2.left_stick_y);
+            //lift with limit
+            if(gamepad2.y && !robot.Lift.topLimit.isPressed()){
+                //while y button is pressed and top limit is not pressed, extend lift
+                robot.Lift.lift.setPower(-1);
+            }
+            else if(gamepad2.x && !robot.Lift.topLimit.isPressed()){
+                robot.Lift.lift.setPower(1);
+            }
+            else if(gamepad2.x==false && gamepad2.y==false){
+                if(gamepad2.dpad_down == true) {
+                    robot.Lift.lift.setPower(-1);
+                } else if(gamepad2.dpad_up == true){
+                    robot.Lift.lift.setPower(1);
+                } else {
+                    robot.Lift.lift.setPower(0);
+                }
+            }
+
+
+            //intake pivot
+            robot.intakePivot.setPower(gamepad2.right_stick_y);
+
+            //intake
+            robot.intake.setPower(gamepad2.left_stick_y);
+
+
+         //Stationary
+            // marker dispenser
+            robot.markerDispenser.setPosition(0.55);
+            telemetry.update();
+            telemetry.addData("liftCurrentPosition", robot.Lift.lift.getCurrentPosition());
+            telemetry.addData("dpad_up", gamepad2.dpad_up);
+            telemetry.addData("dpad_down", gamepad2.dpad_down);
+
+
 
 
         }

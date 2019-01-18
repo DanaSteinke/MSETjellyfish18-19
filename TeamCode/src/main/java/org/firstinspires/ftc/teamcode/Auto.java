@@ -38,7 +38,13 @@ public class Auto extends LinearOpMode {
 
         //Start Auto
 
-
+        robot.markerDispenser.setPosition(0.55);
+        sleep(700);
+        robot.Lift.ExtendingLift();
+        robot.Lift.DetractLift();
+        robot.markerDispenser.setPosition(0);
+        sleep(700);
+        /*
         robot.driveBase.VectorDistance(0.8,2000,0);
         robot.driveBase.VectorDistance(0.8,2000,90);
         robot.driveBase.VectorDistance(0.8,2000,180);
@@ -49,9 +55,7 @@ public class Auto extends LinearOpMode {
         robot.driveBase.gyroToGo(90);
         robot.driveBase.gyroToGo(180);
         robot.driveBase.gyroToGo(270);
-        robot.markerDispenser.setPosition(0.5);
-
-        sleep(700);
+        */
 
 
 

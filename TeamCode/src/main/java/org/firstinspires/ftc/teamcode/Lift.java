@@ -14,14 +14,14 @@ public class Lift {
     LinearOpMode opMode;
 
     public DcMotor lift;
-    //public TouchSensor topLimit;
+    public TouchSensor topLimit;
 
     public Lift(LinearOpMode opMode) throws InterruptedException {
         this.opMode = opMode;
 
         //initialize motors
         lift = opMode.hardwareMap.dcMotor.get("lift");
-        //topLimit= opMode.hardwareMap.touchSensor.get("topLimit");
+        topLimit= opMode.hardwareMap.touchSensor.get("topLimit");
 
 
     }
@@ -30,7 +30,7 @@ public class Lift {
         lift.setPower(power);
     }
 
-    public void EncoderDetractLift(double power, int distance){
+    public void EncoderDetractLift(double power, int distance) throws InterruptedException{
 
         //Restart Encoders
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -52,23 +52,24 @@ public class Lift {
 
         }
         lift.setPower(0.0);
-        //opMode.sleep(100);
+        opMode.sleep(100);
         lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
-/*
+
     //MAGNETIC LIMIT SWITCH(TOUCH SENSOR)
-    public void ExtendingLift() throws InterruptedException{
-        EncoderDetractLift(-1,-2000) ;
+    public void DetractLift() throws InterruptedException{
+        EncoderDetractLift(-1,-15) ;
         while(!topLimit.isPressed() && opMode.opModeIsActive()){
             //if top limit switch is not pressed, go up
             lift.setPower(-1);
+
         }
         lift.setPower(0.0);
         opMode.sleep(100);
     }
-    public void DetractLift() throws InterruptedException{
-        EncoderDetractLift(1,2000);
+    public void ExtendingLift() throws InterruptedException{
+        EncoderDetractLift(1,15);
         while(!topLimit.isPressed() && opMode.opModeIsActive()){
             //if top limit switch is not pressed, go up
             lift.setPower(1);
@@ -76,7 +77,7 @@ public class Lift {
         lift.setPower(0.0);
         opMode.sleep(100);
     }
-*/
+
 
 
 
