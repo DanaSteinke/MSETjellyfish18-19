@@ -150,14 +150,15 @@ public class DriveBase {
     void VectorDistance(double power, int distance, double directionalAngle) throws InterruptedException {
         //match gyro direction
         directionalAngle += 90;
-
+        //multiplier
+        double m = 1.25;
         double r = power;
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
         //calculate voltage for each motor
-        double v1 = r * Math.cos(robotAngle);
-        double v2 = r * Math.sin(robotAngle);
-        double v3 = r * Math.sin(robotAngle);
-        double v4 = r * Math.cos(robotAngle);
+        double v1 = m*r * Math.cos(robotAngle);
+        double v2 = m*r * Math.sin(robotAngle);
+        double v3 = m*r * Math.sin(robotAngle);
+        double v4 = m*r * Math.cos(robotAngle);
 
         //calculate max power for each motor
         /*
@@ -470,27 +471,29 @@ public class DriveBase {
         }
     }
 
-    public void gyroToGo(double angle, double offset) throws InterruptedException {
+    public void gyroToGo(double angle, double offset, double power) throws InterruptedException {
         double angleoffset = offset;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
-        int previousposition = rangeresult.position;
+        int previousposition = -10;
         double distance = rangeresult.distance;
         double previouspower = 0.3;
         double powerlevel = 0.5;
         double k = 0.3;
-
+        int count = 0;
         while (opMode.opModeIsActive()) {
             opMode.telemetry.update();
             opMode.telemetry.addData("distance", rangeresult.distance);
-            opMode.telemetry.addData("angle", angle);
+            opMode.telemetry.addData("powerlevel", powerlevel);
+            opMode.telemetry.addData("position", rangeresult.position);
+            opMode.telemetry.addData("countTurn", count);
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
             distance = rangeresult.distance;
 
             //adjust power level\
-            powerlevel = 0.3;
+            powerlevel = power;
 
             //turn or stop
             if (position == 0) {
@@ -498,23 +501,31 @@ public class DriveBase {
                 waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
-                    //opMode.sleep(300);
+                    opMode.telemetry.update();
+                    opMode.telemetry.addData("Finished with gyro to go-position", rangeresult.position);
+                    opMode.telemetry.addData("position:", rangeresult.position);
+                    opMode.sleep(300);
                     break;
                 }
                 //position is left of heading, rotate right
             } else if (position == 1) {
-                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
+                if ((previouspower != powerlevel || previousposition != position)) {
+                    //int deg= Math.round((float) (run360/360)*(float)(distance));
+                    //RotateDistance(powerlevel, deg);
                     rotateRight(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
+                    count++;
                 }
                 //position is right of heading, rotate left
             } else if (position == -1) {
-                if ((previouspower != powerlevel || previousposition != position) || (previouspower != powerlevel && previousposition != position)) {
+                if (previouspower != powerlevel || previousposition != position) {
+                    //int deg= Math.round((float) (run360/360)*(float)(distance));
+                    //RotateDistance(-powerlevel, -deg);
                     rotateLeft(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
-
+                    count++;
                 }
             }
         }
@@ -584,12 +595,12 @@ public class DriveBase {
     }
 
 
-    void setHeadingToZero() throws InterruptedException{
+    void setHeadingToZero() throws InterruptedException {
         gyroInit();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
 
-    public void gyroInit() throws InterruptedException{
+    public void gyroInit() throws InterruptedException {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;

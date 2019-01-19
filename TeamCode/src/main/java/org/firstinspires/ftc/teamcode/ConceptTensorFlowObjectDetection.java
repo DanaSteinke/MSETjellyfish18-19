@@ -114,7 +114,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
                       telemetry.addData("# Object Detected", updatedRecognitions.size());
-                      if (updatedRecognitions.size() == 3) {
+                      if (updatedRecognitions.size() == 2) {
                         int goldMineralX = -1;
                         int silverMineral1X = -1;
                         int silverMineral2X = -1;
@@ -127,14 +127,13 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                             silverMineral2X = (int) recognition.getLeft();
                           }
                         }
-                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                          if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                            telemetry.addData("Gold Mineral Position", "Left");
-                          } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                        if (goldMineralX == -1 && silverMineral1X != -1) {
                             telemetry.addData("Gold Mineral Position", "Right");
-                          } else {
+                        } else if(goldMineralX != -1 && silverMineral1X != -1)
+                          if (goldMineralX > silverMineral1X) {
                             telemetry.addData("Gold Mineral Position", "Center");
-                          }
+                          } else {
+                            telemetry.addData("Gold Mineral Position", "Left");
                         }
                       }
                       telemetry.update();
@@ -175,7 +174,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         //TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters();
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.62;
+        tfodParameters.minimumConfidence = 0.4;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
