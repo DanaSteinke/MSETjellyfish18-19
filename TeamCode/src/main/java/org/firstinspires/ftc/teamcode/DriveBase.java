@@ -147,9 +147,9 @@ public class DriveBase {
 
     //if rotationalPower, insert power:0 and directionalAngle:0
     //power and rotational power between -1 and 1
-    void VectorDistance(double power, int distance, double directionalAngle) {
+    void VectorDistance(double power, int distance, double directionalAngle) throws InterruptedException {
         //match gyro direction
-        directionalAngle -= 90;
+        directionalAngle += 90;
 
         double r = power;
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
@@ -197,20 +197,64 @@ public class DriveBase {
 
         //tune for Vector Distance
         //RangeResult rangeResult10 = inRange(directionalAngle, 10);
+        //int v1distance, v2distance, v3distance, v4distance;
 
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
             /*
+            if (rangeResult10.position != 0) {
 
-            if(rangeResult10.position != 0){
+                v1distance = frontLeft.getTargetPosition() - frontLeft.getCurrentPosition();
+                v2distance = frontRight.getTargetPosition() - frontRight.getCurrentPosition();
+                v3distance = backLeft.getTargetPosition() - backLeft.getCurrentPosition();
+                v4distance = backRight.getTargetPosition() - backRight.getCurrentPosition();
+
+//                frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+                frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
                 gyroToGo(directionalAngle, 10);
 
-            }
 
-            v1 = r * Math.cos(robotAngle);
-            v2 = r * Math.sin(robotAngle);
-            v3 = r * Math.sin(robotAngle);
-            v4 = r * Math.cos(robotAngle);
+                frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                frontLeft.setTargetPosition(v1distance);
+                frontRight.setTargetPosition(v2distance);
+                backLeft.setTargetPosition(v3distance);
+                backRight.setTargetPosition(v4distance);
+
+                frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                */
+
+                /*
+                try{
+                   gyroToGo(directionalAngle, 10);
+                }
+                catch(InterruptedException ex){
+                    System.out.print(ex.getMessage());
+                }
+
+
+            }
 
             frontLeft.setPower(v1);
             frontRight.setPower(v2);
@@ -218,16 +262,15 @@ public class DriveBase {
             backRight.setPower(v4);
 
 
-
             rangeResult10 = inRange(directionalAngle, 10);
-
             */
 
+
             opMode.telemetry.update();
-            opMode.telemetry.addData("v1",v1);
-            opMode.telemetry.addData("v2",v2);
-            opMode.telemetry.addData("v3",v3);
-            opMode.telemetry.addData("v4",v4);
+            opMode.telemetry.addData("v1", v1);
+            opMode.telemetry.addData("v2", v2);
+            opMode.telemetry.addData("v3", v3);
+            opMode.telemetry.addData("v4", v4);
 
             opMode.telemetry.update();
 
@@ -427,7 +470,7 @@ public class DriveBase {
         }
     }
 
-    public void gyroToGo(double angle, double offset) throws InterruptedException{
+    public void gyroToGo(double angle, double offset) throws InterruptedException {
         double angleoffset = offset;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
@@ -452,12 +495,9 @@ public class DriveBase {
             //turn or stop
             if (position == 0) {
                 StopDriving();
-                //waitUntilStable();
+                waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
-                    opMode.telemetry.update();
-                    opMode.telemetry.addData("Finished with gyro to go-position", rangeresult.position);
-                    opMode.telemetry.addData("distance:", rangeresult.distance);
                     //opMode.sleep(300);
                     break;
                 }
@@ -544,12 +584,13 @@ public class DriveBase {
     }
 
 
-    void setHeadingToZero() {
+    void setHeadingToZero() throws InterruptedException{
         gyroInit();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
 
-    public void gyroInit() {
+    public void gyroInit() throws InterruptedException{
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -565,7 +606,7 @@ public class DriveBase {
         byte AXIS_MAP_CONFIG_BYTE = 0x18;
         byte AXIS_MAP_SIGN_BYTE = 0x1;
 
-        imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
+        imu.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
         /*
         try {
             Thread.sleep(100);
@@ -574,9 +615,9 @@ public class DriveBase {
             Thread.currentThread().interrupt();
         }
         */
-        imu.write8(BNO055IMU.Register.AXIS_MAP_CONFIG,AXIS_MAP_CONFIG_BYTE & 0x0F);
-        imu.write8(BNO055IMU.Register.AXIS_MAP_SIGN,AXIS_MAP_SIGN_BYTE & 0x0F);
-        imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.IMU.bVal & 0x0F);
+        imu.write8(BNO055IMU.Register.AXIS_MAP_CONFIG, AXIS_MAP_CONFIG_BYTE & 0x0F);
+        imu.write8(BNO055IMU.Register.AXIS_MAP_SIGN, AXIS_MAP_SIGN_BYTE & 0x0F);
+        imu.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.IMU.bVal & 0x0F);
         /*
         try {
             Thread.sleep(100);

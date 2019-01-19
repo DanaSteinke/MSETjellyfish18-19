@@ -30,34 +30,34 @@ public class Auto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot = new Robot(this);
         robot.driveBase.composeTelemetry();
-        robot.driveBase.setHeadingToZero();
-        robot.markerDispenser.setPosition(1);
+        robot.markerDispenser.setPosition(0.55);
 
 
         waitForStart();
+        robot.driveBase.setHeadingToZero();
 
         //Start Auto
-
-        robot.markerDispenser.setPosition(0.55);
-        sleep(700);
+        //extend lift
         robot.Lift.ExtendingLift();
-        robot.Lift.DetractLift();
+
+        //turn to prep position after extending lift
+        robot.driveBase.VectorDistance(0.5, 500, 180);
+        robot.driveBase.VectorDistance(1, 200, 270);
+        robot.driveBase.VectorDistance(1, 300, 90);
+        robot.driveBase.gyroToGo(320);
+
+        //drive to the marker depot
+        robot.driveBase.VectorDistance(1, 3100, 180);
+        robot.driveBase.gyroToGo(230);
+        robot.driveBase.VectorDistance(1, 3600, 180);
+
+        //dispense marker and drive to crater
         robot.markerDispenser.setPosition(0);
         sleep(700);
-        /*
-        robot.driveBase.VectorDistance(0.8,2000,0);
-        robot.driveBase.VectorDistance(0.8,2000,90);
-        robot.driveBase.VectorDistance(0.8,2000,180);
-        robot.driveBase.VectorDistance(0.8,2000,270);
-
-
-        robot.driveBase.gyroToGo(0);
-        robot.driveBase.gyroToGo(90);
-        robot.driveBase.gyroToGo(180);
-        robot.driveBase.gyroToGo(270);
-        */
-
-
+        robot.markerDispenser.setPosition(0.55);
+        sleep(700);
+        robot.driveBase.VectorDistance(1, 7000, 0);
+        robot.Lift.DetractLift();
 
 
     }

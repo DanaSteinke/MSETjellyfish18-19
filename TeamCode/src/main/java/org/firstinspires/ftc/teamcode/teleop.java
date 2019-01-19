@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @TeleOp(name = "teleop")
@@ -60,31 +61,47 @@ public class teleop extends LinearOpMode{
             else if(gamepad2.x && !robot.Lift.topLimit.isPressed()){
                 robot.Lift.lift.setPower(1);
             }
-            else if(gamepad2.x==false && gamepad2.y==false){
+            else if(gamepad2.x==false || gamepad2.y==false){
                 if(gamepad2.dpad_down == true) {
                     robot.Lift.lift.setPower(-1);
                 } else if(gamepad2.dpad_up == true){
                     robot.Lift.lift.setPower(1);
                 } else {
                     robot.Lift.lift.setPower(0);
+                    robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 }
             }
 
 
             //intake pivot
-            robot.intakePivot.setPower(gamepad2.right_stick_y);
+            robot.intakePivot.setPower(gamepad2.right_stick_y*0.85);
 
             //intake
-            robot.intake.setPower(gamepad2.left_stick_y);
+            if(gamepad2.a == true){
+                robot.intake.setPower(1);
+            } else if(gamepad2.b == true){
+                robot.intake.setPower(-1);
+            } else{
+                robot.intake.setPower(0.0);
+            }
 
-
+            //elevator
+            if(gamepad2.dpad_left == true){
+                robot.elevator.setPower(0.8);
+            } else if(gamepad2.dpad_right){
+                robot.elevator.setPower(-0.4);
+            } else{
+                robot.elevator.setPower(0.0);
+                robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            }
          //Stationary
             // marker dispenser
             robot.markerDispenser.setPosition(0.55);
             telemetry.update();
             telemetry.addData("liftCurrentPosition", robot.Lift.lift.getCurrentPosition());
-            telemetry.addData("dpad_up", gamepad2.dpad_up);
-            telemetry.addData("dpad_down", gamepad2.dpad_down);
+            telemetry.addData("elevatorPower", robot.elevator.getPower());
+            telemetry.addData("gamepad2.x", gamepad2.x);
+            telemetry.addData("gamepad2.y", gamepad2.y);
 
 
 

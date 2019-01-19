@@ -11,6 +11,7 @@ public class Robot {
     public Servo markerDispenser;
     public DcMotor intakePivot;
     public DcMotor intake;
+    public DcMotor elevator;
 
 
 
@@ -22,6 +23,7 @@ public class Robot {
         markerDispenser = opMode.hardwareMap.servo.get("markerDispenser");
         intakePivot = opMode.hardwareMap.dcMotor.get("intakePivot");
         intake = opMode.hardwareMap.dcMotor.get("intake");
+        elevator = opMode.hardwareMap.dcMotor.get("elevator");
     }
 
 

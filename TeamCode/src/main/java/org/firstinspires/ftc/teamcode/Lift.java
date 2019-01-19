@@ -57,9 +57,15 @@ public class Lift {
 
     }
 
+    public void TimedExtendLift(double power, long time) throws IllegalArgumentException{
+        lift.setPower(power);
+        opMode.sleep(time);
+    }
+
     //MAGNETIC LIMIT SWITCH(TOUCH SENSOR)
     public void DetractLift() throws InterruptedException{
-        EncoderDetractLift(-1,-15) ;
+        TimedExtendLift(-1,500);
+
         while(!topLimit.isPressed() && opMode.opModeIsActive()){
             //if top limit switch is not pressed, go up
             lift.setPower(-1);
@@ -69,7 +75,7 @@ public class Lift {
         opMode.sleep(100);
     }
     public void ExtendingLift() throws InterruptedException{
-        EncoderDetractLift(1,15);
+        TimedExtendLift(1,500);
         while(!topLimit.isPressed() && opMode.opModeIsActive()){
             //if top limit switch is not pressed, go up
             lift.setPower(1);
