@@ -151,7 +151,7 @@ public class DriveBase {
         //match gyro direction
         directionalAngle += 90;
         //multiplier
-        double m = 1.25;
+        double m = 1.41;
         double r = power;
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
         //calculate voltage for each motor
@@ -361,6 +361,8 @@ public class DriveBase {
         if (degree < 0) {
             degree = degree + 360;
         }
+        opMode.telemetry.addData("degree", degree);
+        opMode.telemetry.addData("angle", angle);
 
         //find distance from angle to degree
         range.distance = Math.abs(angle - degree);
@@ -422,11 +424,7 @@ public class DriveBase {
         double k = 0.3;
         int count = 0;
         while (opMode.opModeIsActive()) {
-            opMode.telemetry.update();
-            opMode.telemetry.addData("distance", rangeresult.distance);
-            opMode.telemetry.addData("powerlevel", powerlevel);
-            opMode.telemetry.addData("position", rangeresult.position);
-            opMode.telemetry.addData("countTurn", count);
+
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
@@ -441,9 +439,6 @@ public class DriveBase {
                 waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
-                    opMode.telemetry.update();
-                    opMode.telemetry.addData("Finished with gyro to go-position", rangeresult.position);
-                    opMode.telemetry.addData("position:", rangeresult.position);
                     opMode.sleep(300);
                     break;
                 }

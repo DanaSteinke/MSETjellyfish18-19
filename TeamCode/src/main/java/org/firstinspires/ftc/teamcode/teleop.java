@@ -31,19 +31,22 @@ public class teleop extends LinearOpMode {
             double r = Math.hypot(xValue, yValue);
             double robotAngle = Math.atan2(yValue, xValue) - Math.PI / 4;
             double rotationalPower = -gamepad1.right_stick_x;
+            //multiplier
+            double m = 1.41;
 
             //calculate direction of voltages to max value with sine cosine functions
             //voltages are without magnitude(joystick) nor rotational Power yet
-            double v1 = r * Math.cos(robotAngle) + rotationalPower;
-            double v2 = r * Math.sin(robotAngle) - rotationalPower;
-            double v3 = r * Math.sin(robotAngle) + rotationalPower;
-            double v4 = r * Math.cos(robotAngle) - rotationalPower;
+            double v1 = m * r * Math.cos(robotAngle) + rotationalPower;
+            double v2 = m * r * Math.sin(robotAngle) - rotationalPower;
+            double v3 = m * r * Math.sin(robotAngle) + rotationalPower;
+            double v4 = m * r * Math.cos(robotAngle) - rotationalPower;
+
 
             if (gamepad1.right_bumper == true) {
-                robot.driveBase.frontLeft.setPower(v1 * 0.4);
-                robot.driveBase.frontRight.setPower(v2 * 0.4);
-                robot.driveBase.backLeft.setPower(v3 * 0.4);
-                robot.driveBase.backRight.setPower(v4 * 0.4);
+                robot.driveBase.frontLeft.setPower(v1 * 0.5);
+                robot.driveBase.frontRight.setPower(v2 * 0.5);
+                robot.driveBase.backLeft.setPower(v3 * 0.5);
+                robot.driveBase.backRight.setPower(v4 * 0.5);
             } else {
                 robot.driveBase.frontLeft.setPower(v1);
                 robot.driveBase.frontRight.setPower(v2);
@@ -104,8 +107,6 @@ public class teleop extends LinearOpMode {
             //Stationary
             // marker dispenser
             robot.markerDispenser.setPosition(0.55);
-
-
 
 
         }

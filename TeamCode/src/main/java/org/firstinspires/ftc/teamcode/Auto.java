@@ -17,7 +17,6 @@ public class Auto extends LinearOpMode {
         robot.driveBase.composeTelemetry();
         robot.markerDispenser.setPosition(0.55);
 
-
         waitForStart();
         robot.driveBase.setHeadingToZero();
 

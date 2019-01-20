@@ -32,16 +32,16 @@ public class AutoBlueMarker extends LinearOpMode {
         robot.driveBase.gyroToGo(320);
 
         //drive to the marker depot
-        robot.driveBase.VectorDistance(1.25, 3100, 180);
-        robot.driveBase.gyroToGo(230);
-        robot.driveBase.VectorDistance(1.25, 3600, 180);
+        robot.driveBase.VectorDistance(1, 3350, 180);
+        robot.driveBase.gyroToGo(227, 4, 0.28);
+        robot.driveBase.VectorDistance(1, 3300, 180);
 
         //dispense marker and drive to crater
         robot.markerDispenser.setPosition(0);
         sleep(700);
         robot.markerDispenser.setPosition(0.55);
         sleep(700);
-        robot.driveBase.VectorDistance(1.25, 7000, 0);
+        robot.driveBase.VectorDistance(1, 6800, 0);
         robot.Lift.DetractLift();
 
     }

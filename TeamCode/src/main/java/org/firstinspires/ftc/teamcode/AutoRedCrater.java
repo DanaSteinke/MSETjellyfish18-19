@@ -37,9 +37,9 @@ public class AutoRedCrater extends LinearOpMode {
         //drive to the marker depot
         robot.driveBase.VectorDistance(1, 1500, 180);
         robot.driveBase.gyroToGo(0);
-        robot.driveBase.VectorDistance(1.25, 3000, 180);
+        robot.driveBase.VectorDistance(1, 3000, 180);
         robot.driveBase.gyroToGo(40);
-        robot.driveBase.VectorDistance(1.25, 2800, 180);
+        robot.driveBase.VectorDistance(1, 2800, 180);
 
         //dispense marker and drive to crater
         robot.driveBase.gyroToGo(0, 10, 0.4);
