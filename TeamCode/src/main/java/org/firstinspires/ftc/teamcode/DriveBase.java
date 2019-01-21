@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import android.util.Log;
 
 import java.util.Locale;
 
@@ -155,10 +157,10 @@ public class DriveBase {
         double r = power;
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
         //calculate voltage for each motor
-        double v1 = m*r * Math.cos(robotAngle);
-        double v2 = m*r * Math.sin(robotAngle);
-        double v3 = m*r * Math.sin(robotAngle);
-        double v4 = m*r * Math.cos(robotAngle);
+        double v1 = m * r * Math.cos(robotAngle);
+        double v2 = m * r * Math.sin(robotAngle);
+        double v3 = m * r * Math.sin(robotAngle);
+        double v4 = m * r * Math.cos(robotAngle);
 
         //calculate max power for each motor
         /*
@@ -361,6 +363,11 @@ public class DriveBase {
         if (degree < 0) {
             degree = degree + 360;
         }
+        if(degree == 360){
+            degree = 0;
+        }
+        assert(degree < 360);
+
         opMode.telemetry.addData("degree", degree);
         opMode.telemetry.addData("angle", angle);
 
@@ -368,6 +375,7 @@ public class DriveBase {
         range.distance = Math.abs(angle - degree);
         double right = angle - offset;
         double left = angle + offset;
+
         //if right is less than 0 degrees; out of bounds
         if (right < 0) {
             right = right + 360;
@@ -377,7 +385,7 @@ public class DriveBase {
                 range.position = 1;
             }
             //if left is greater than 360 degrees; out of bounds
-        } else if (left >= 360) {
+        } else if (left > 360) {
             left = left - 360;
             if (degree < left || degree > right) {
                 range.position = 0;
@@ -411,84 +419,43 @@ public class DriveBase {
         return range;
     }
 
-    //turn left when -1
-    //turn right when 1
+    /*
+    * @param position -1, turn left
+    * @param position 1, turn right
+    */
     public void gyroToGo(double angle) throws InterruptedException {
-        double angleoffset = 5;
-        RangeResult rangeresult = inRange(angle, angleoffset);
-        int position = rangeresult.position;
-        int previousposition = -10;
-        double distance = rangeresult.distance;
-        double previouspower = 0.3;
-        double powerlevel = 0.5;
-        double k = 0.3;
-        int count = 0;
-        while (opMode.opModeIsActive()) {
-
-            //update rangeresult
-            rangeresult = inRange(angle, angleoffset);
-            position = rangeresult.position;
-            distance = rangeresult.distance;
-
-            //adjust power level\
-            powerlevel = 0.3;
-
-            //turn or stop
-            if (position == 0) {
-                StopDriving();
-                waitUntilStable();
-                rangeresult = inRange(angle, angleoffset);
-                if (rangeresult.position == 0) {
-                    opMode.sleep(300);
-                    break;
-                }
-                //position is left of heading, rotate right
-            } else if (position == 1) {
-                if ((previouspower != powerlevel || previousposition != position)) {
-                    //int deg= Math.round((float) (run360/360)*(float)(distance));
-                    //RotateDistance(powerlevel, deg);
-                    rotateRight(powerlevel);
-                    previousposition = position;
-                    previouspower = powerlevel;
-                    count++;
-                }
-                //position is right of heading, rotate left
-            } else if (position == -1) {
-                if (previouspower != powerlevel || previousposition != position) {
-                    //int deg= Math.round((float) (run360/360)*(float)(distance));
-                    //RotateDistance(-powerlevel, -deg);
-                    rotateLeft(powerlevel);
-                    previousposition = position;
-                    previouspower = powerlevel;
-                    count++;
-                }
-            }
-        }
+        gyroToGo(angle, 4);
     }
 
-    public void gyroToGo(double angle, double offset, double power) throws InterruptedException {
+    public void gyroToGo(double angle, double offset) throws InterruptedException {
         double angleoffset = offset;
         RangeResult rangeresult = inRange(angle, angleoffset);
         int position = rangeresult.position;
         int previousposition = -10;
         double distance = rangeresult.distance;
-        double previouspower = 0.3;
-        double powerlevel = 0.5;
-        double k = 0.3;
-        int count = 0;
+        double previouspower = 0.0;
+        double powerlevel = 0.3;
         while (opMode.opModeIsActive()) {
             opMode.telemetry.update();
             opMode.telemetry.addData("distance", rangeresult.distance);
             opMode.telemetry.addData("powerlevel", powerlevel);
-            opMode.telemetry.addData("position", rangeresult.position);
-            opMode.telemetry.addData("countTurn", count);
+
+            Log.d("telemetry","distance =" + rangeresult.distance);
+            Log.d("telemetry","powerlevel =" + powerlevel);
+
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
             distance = rangeresult.distance;
 
             //adjust power level\
-            powerlevel = power;
+            if(distance > 90) {
+                powerlevel = 1;
+            } else if(distance > 45){
+                powerlevel = 0.6;
+            } else{
+                powerlevel = 0.28;
+            }
 
             //turn or stop
             if (position == 0) {
@@ -496,9 +463,6 @@ public class DriveBase {
                 waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
-                    opMode.telemetry.update();
-                    opMode.telemetry.addData("Finished with gyro to go-position", rangeresult.position);
-                    opMode.telemetry.addData("position:", rangeresult.position);
                     opMode.sleep(300);
                     break;
                 }
@@ -510,7 +474,6 @@ public class DriveBase {
                     rotateRight(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
-                    count++;
                 }
                 //position is right of heading, rotate left
             } else if (position == -1) {
@@ -520,7 +483,6 @@ public class DriveBase {
                     rotateLeft(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
-                    count++;
                 }
             }
         }
