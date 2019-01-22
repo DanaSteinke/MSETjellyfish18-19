@@ -88,10 +88,12 @@ public class DriveBase {
     }
 
     public void rotateLeft(double power) {
+
         frontLeft.setPower(power);
         backLeft.setPower(power);
         frontRight.setPower(-power);
         backRight.setPower(-power);
+
     }
 
     public void rotateRight(double power) {
@@ -106,7 +108,7 @@ public class DriveBase {
     }
 
     //Encoder Functions
-    public void DriveForwardDistance(double power, int distance) {
+    public void RotateDistance(double power, int distance) {
 
         //Restart Encoders
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -115,8 +117,8 @@ public class DriveBase {
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Start Target Position
-        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + distance);
-        backLeft.setTargetPosition(backLeft.getCurrentPosition() + distance);
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() - distance);
+        backLeft.setTargetPosition(backLeft.getCurrentPosition() - distance);
         frontRight.setTargetPosition(backLeft.getCurrentPosition() + distance);
         backRight.setTargetPosition(backLeft.getCurrentPosition() + distance);
 
@@ -145,6 +147,8 @@ public class DriveBase {
         }
         return result;
     }
+
+
 
 
     //if rotationalPower, insert power:0 and directionalAngle:0
@@ -345,31 +349,36 @@ public class DriveBase {
             }
         }
     }
-
     static class RangeResult {
         public double distance;
         public int position;
     }
 
-    //position 0= in range
-    //position 1= degree is greater than left
-    //position -1= degree is less than right
+
+
     public RangeResult inRange(double angle, double offset) {
         opMode.telemetry.addData("ExecutionTimeinMilliseconds", timeElapse / 1000000);
         RangeResult range = new RangeResult();
         opMode.telemetry.update();
         double degree = heading;
-
+        if(degree >= 180 || degree <=-180){
+            degree=0;
+        }
         if (degree < 0) {
             degree = degree + 360;
         }
         if(degree == 360){
             degree = 0;
         }
-        assert(degree < 360);
 
+        /*
         opMode.telemetry.addData("degree", degree);
         opMode.telemetry.addData("angle", angle);
+        opMode.telemetry.log().add(""+opMode.telemetry.getMsTransmissionInterval());
+        opMode.telemetry.log().add("heading", heading);
+        opMode.telemetry.log().add("degree", degree);
+        opMode.telemetry.log().add("angle", angle);
+        */
 
         //find distance from angle to degree
         range.distance = Math.abs(angle - degree);
@@ -420,9 +429,9 @@ public class DriveBase {
     }
 
     /*
-    * @param position -1, turn left
-    * @param position 1, turn right
-    */
+     * @param position -1, turn left
+     * @param position 1, turn right
+     */
     public void gyroToGo(double angle) throws InterruptedException {
         gyroToGo(angle, 4);
     }
@@ -433,26 +442,24 @@ public class DriveBase {
         int position = rangeresult.position;
         int previousposition = -10;
         double distance = rangeresult.distance;
+        //double previousdegree = degree;
         double previouspower = 0.0;
         double powerlevel = 0.3;
         while (opMode.opModeIsActive()) {
             opMode.telemetry.update();
-            opMode.telemetry.addData("distance", rangeresult.distance);
-            opMode.telemetry.addData("powerlevel", powerlevel);
-
-            Log.d("telemetry","distance =" + rangeresult.distance);
-            Log.d("telemetry","powerlevel =" + powerlevel);
 
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
             distance = rangeresult.distance;
 
+
+
             //adjust power level\
             if(distance > 90) {
-                powerlevel = 1;
+                powerlevel = 0.7;
             } else if(distance > 45){
-                powerlevel = 0.6;
+                powerlevel = 0.5;
             } else{
                 powerlevel = 0.28;
             }
