@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -15,7 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
 import android.util.Log;
+
 
 import java.util.Locale;
 
@@ -149,8 +149,6 @@ public class DriveBase {
     }
 
 
-
-
     //if rotationalPower, insert power:0 and directionalAngle:0
     //power and rotational power between -1 and 1
     void VectorDistance(double power, int distance, double directionalAngle) throws InterruptedException {
@@ -279,8 +277,6 @@ public class DriveBase {
             opMode.telemetry.addData("v3", v3);
             opMode.telemetry.addData("v4", v4);
 
-            opMode.telemetry.update();
-
             opMode.telemetry.addData("frontLeftP:", frontLeft.getPower());
             opMode.telemetry.addData("frontRightP:", frontRight.getPower());
             opMode.telemetry.addData("backLeftP:", backLeft.getPower());
@@ -349,36 +345,39 @@ public class DriveBase {
             }
         }
     }
+
     static class RangeResult {
         public double distance;
         public int position;
     }
 
+    public double getDegree() {
+        opMode.telemetry.update();
+        double degree = heading;
+        if (degree >= 180 || degree <= -180) {
+            degree = 0;
+        }
+        if (degree < 0) {
+            degree = degree + 360;
+        }
+        if (degree == 360) {
+            degree = 0;
+        }
+        return degree;
+    }
 
 
     public RangeResult inRange(double angle, double offset) {
         opMode.telemetry.addData("ExecutionTimeinMilliseconds", timeElapse / 1000000);
         RangeResult range = new RangeResult();
-        opMode.telemetry.update();
-        double degree = heading;
-        if(degree >= 180 || degree <=-180){
-            degree=0;
-        }
-        if (degree < 0) {
-            degree = degree + 360;
-        }
-        if(degree == 360){
-            degree = 0;
-        }
+        double degree = getDegree();
 
-        /*
         opMode.telemetry.addData("degree", degree);
         opMode.telemetry.addData("angle", angle);
-        opMode.telemetry.log().add(""+opMode.telemetry.getMsTransmissionInterval());
-        opMode.telemetry.log().add("heading", heading);
-        opMode.telemetry.log().add("degree", degree);
-        opMode.telemetry.log().add("angle", angle);
-        */
+        Log.d("heading", "" + heading);
+        Log.d("degree", "" + degree);
+        Log.d("angle", "" + angle);
+
 
         //find distance from angle to degree
         range.distance = Math.abs(angle - degree);
@@ -433,34 +432,35 @@ public class DriveBase {
      * @param position 1, turn right
      */
     public void gyroToGo(double angle) throws InterruptedException {
-        gyroToGo(angle, 4);
+        gyroToGo(angle, 5);
     }
 
     public void gyroToGo(double angle, double offset) throws InterruptedException {
         double angleoffset = offset;
         RangeResult rangeresult = inRange(angle, angleoffset);
+        double distance = rangeresult.distance;
         int position = rangeresult.position;
         int previousposition = -10;
-        double distance = rangeresult.distance;
-        //double previousdegree = degree;
-        double previouspower = 0.0;
-        double powerlevel = 0.3;
+        double previouspower = 0.5;
+        double powerlevel = 0.5;
+        boolean forceLowPower = false;
+
         while (opMode.opModeIsActive()) {
-            opMode.telemetry.update();
 
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
             distance = rangeresult.distance;
 
-
-
-            //adjust power level\
-            if(distance > 90) {
-                powerlevel = 0.7;
-            } else if(distance > 45){
+            //change power to 0.5 first time
+            if (distance > 45) {
                 powerlevel = 0.5;
-            } else{
+            } else {
+                powerlevel = 0.28;
+                forceLowPower=true;
+            }
+
+            if (forceLowPower) {
                 powerlevel = 0.28;
             }
 
@@ -476,8 +476,6 @@ public class DriveBase {
                 //position is left of heading, rotate right
             } else if (position == 1) {
                 if ((previouspower != powerlevel || previousposition != position)) {
-                    //int deg= Math.round((float) (run360/360)*(float)(distance));
-                    //RotateDistance(powerlevel, deg);
                     rotateRight(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
@@ -485,13 +483,12 @@ public class DriveBase {
                 //position is right of heading, rotate left
             } else if (position == -1) {
                 if (previouspower != powerlevel || previousposition != position) {
-                    //int deg= Math.round((float) (run360/360)*(float)(distance));
-                    //RotateDistance(-powerlevel, -deg);
                     rotateLeft(powerlevel);
                     previousposition = position;
                     previouspower = powerlevel;
                 }
             }
+
         }
     }
 

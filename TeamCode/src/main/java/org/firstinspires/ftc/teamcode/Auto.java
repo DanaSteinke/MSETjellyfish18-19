@@ -24,9 +24,10 @@ public class Auto extends LinearOpMode {
 
         //Start Auto
         //test gyros
-        for(int i = 0; i <- 4; i++){
-            robot.driveBase.gyroToGo(90*i);
-
+        for(int i = 0; i < 5; i++) {
+            robot.driveBase.gyroToGo(80);
+            robot.driveBase.gyroToGo(270);
+            robot.driveBase.gyroToGo(0);
         }
     }
 }
