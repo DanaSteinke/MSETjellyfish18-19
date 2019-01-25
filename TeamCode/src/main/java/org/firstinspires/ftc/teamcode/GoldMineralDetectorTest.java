@@ -42,29 +42,28 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class GoldMineralDetectorTest extends OpMode
 {
     // Detector object
-    private GoldDetector detector;
+    private GoldDetector goldD;
 
 
     @Override
     public void init() {
         telemetry.addData("Status", "DogeCV 2018.0 - Gold Align Example");
+        //GOLD MINERAL
+            // Set up detector
+            goldD = new GoldDetector(); // Create detector
+            goldD.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
+            goldD.useDefaults(); // Set detector to use default settings
 
-        // Set up detector
-        detector = new GoldDetector(); // Create detector
-        detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
-        detector.useDefaults(); // Set detector to use default settings
+            // Optional tuning
+            goldD.downscale = 0.4; // How much to downscale the input frames
 
-        // Optional tuning
-        detector.downscale = 0.4; // How much to downscale the input frames
+            goldD.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Can also be PERFECT_AREA
+            //detector.perfectAreaScorer.perfectArea = 10000; // if using PERFECT_AREA scoring
+            goldD.maxAreaScorer.weight = 0.005;
+            goldD.ratioScorer.weight = 5;
+            goldD.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
 
-        detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Can also be PERFECT_AREA
-        //detector.perfectAreaScorer.perfectArea = 10000; // if using PERFECT_AREA scoring
-        detector.maxAreaScorer.weight = 0.005; //
-
-        detector.ratioScorer.weight = 5; //
-        detector.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
-
-        detector.enable(); // Start the detector!
+            goldD.enable(); // Start the detector!
 
 
     }
@@ -74,6 +73,7 @@ public class GoldMineralDetectorTest extends OpMode
      */
     @Override
     public void init_loop() {
+
     }
 
     /*
@@ -89,7 +89,8 @@ public class GoldMineralDetectorTest extends OpMode
      */
     @Override
     public void loop() {
-        telemetry.addData("X Pos" , detector.getScreenPosition().x); // Gold X position.
+        telemetry.addData("Gold X Position" , goldD.getScreenPosition().x); // Gold X position.
+        telemetry.addData("found cube",goldD.getFoundRect());
     }
 
     /*
@@ -98,7 +99,7 @@ public class GoldMineralDetectorTest extends OpMode
     @Override
     public void stop() {
         // Disable the detector
-        detector.disable();
+        goldD.disable();
     }
 
 }

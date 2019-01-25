@@ -54,24 +54,6 @@ public class DriveBase {
     }
 
 
-    public void backLeftDistance(double power, int distance) {
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setTargetPosition(backLeft.getCurrentPosition() + distance);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setPower(power);
-        while (backLeft.isBusy()) {
-
-        }
-        backLeft.setPower(0);
-        opMode.sleep(300);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    }
-
-    public void backRightDistance(double power) {
-        backRight.setPower(power);
-    }
-
     //Driving Power Functions
     public void DriveForward(double power) {
         frontLeft.setPower(power);
@@ -148,6 +130,41 @@ public class DriveBase {
         return result;
     }
 
+    public void strafeLeft(double power, double diff) {
+        double pfl = scaleDiffPower(-power, diff, 1.0);
+        double pbl = scaleDiffPower(power, diff, 1.0);
+        double pfr = scaleDiffPower(power, diff, -1.0);
+        double pbr = scaleDiffPower(-power, diff, -1.0);
+        safeDrive(pfl, pbl, pfr, pbr);
+    }
+
+    public void safeDrive(double pfl, double pbl, double pfr, double pbr) {
+        // Stagger the order to reduce left/right front/back bias at start
+        frontLeft.setPower(safePower(pfl));
+        backRight.setPower(safePower(pbr));
+        backLeft.setPower(safePower(pbl));
+        frontRight.setPower(safePower(pfr));
+    }
+
+    public double safePower(double power) {
+        if (power < -1.0) {
+            power = -1.0;
+        }
+        if (power > 1.0) {
+            power = 1.0;
+        }
+        // 0.7 is because AndyMark motors in Encoder mode have less RPMs
+        return 0.7 * power;
+    }
+
+    public double scaleDiffPower(double power, double diff, double sign) {
+        double p = 0.0;
+        double p2 = power + (sign * diff);
+        // p2 changes the power by absolute amount
+        p = p2;
+        return safePower(p);
+    }
+
 
     //if rotationalPower, insert power:0 and directionalAngle:0
     //power and rotational power between -1 and 1
@@ -155,7 +172,7 @@ public class DriveBase {
         //match gyro direction
         directionalAngle += 90;
         //multiplier
-        double m = 1.41;
+        double m = 1;
         double r = power;
         double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
         //calculate voltage for each motor
@@ -163,16 +180,7 @@ public class DriveBase {
         double v2 = m * r * Math.sin(robotAngle);
         double v3 = m * r * Math.sin(robotAngle);
         double v4 = m * r * Math.cos(robotAngle);
-
-        //calculate max power for each motor
-        /*
-        double[] vArray={v1,v2,v3,v4};
-        for(int i=0; i<vArray.length; i++){
-            if(Math.abs(vArray[i])>1) {
-                vArray[i]=positiveNegative(vArray[i]);
-            }
-        }
-        */
+        //safe power
 
         //reset encoders
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -200,7 +208,7 @@ public class DriveBase {
         backRight.setPower(v4);
 
 
-        //tune for Vector Distance
+        //correcting for Vector Distance with gyro
         //RangeResult rangeResult10 = inRange(directionalAngle, 10);
         //int v1distance, v2distance, v3distance, v4distance;
 
@@ -297,39 +305,6 @@ public class DriveBase {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    void RotateRight(double power, int distance) throws InterruptedException {
-
-        //reset encoders
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + distance);
-        backLeft.setTargetPosition(backLeft.getCurrentPosition() + distance);
-        frontRight.setTargetPosition(frontRight.getCurrentPosition() - distance);
-        backRight.setTargetPosition(backRight.getCurrentPosition() - distance);
-
-
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        rotateRight(power);
-
-        while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
-            //wait until robot stops
-        }
-        StopDriving();
-        opMode.sleep(300);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //GYRO
     public void waitUntilStable() throws InterruptedException {
@@ -368,15 +343,12 @@ public class DriveBase {
 
 
     public RangeResult inRange(double angle, double offset) {
+        if (angle == 360) {
+            angle = 0;
+        }
         opMode.telemetry.addData("ExecutionTimeinMilliseconds", timeElapse / 1000000);
         RangeResult range = new RangeResult();
         double degree = getDegree();
-
-        opMode.telemetry.addData("degree", degree);
-        opMode.telemetry.addData("angle", angle);
-        Log.d("heading", "" + heading);
-        Log.d("degree", "" + degree);
-        Log.d("angle", "" + angle);
 
 
         //find distance from angle to degree
@@ -391,6 +363,10 @@ public class DriveBase {
                 range.position = 0;
             } else {
                 range.position = 1;
+                if(range.distance > 180) {
+                    range.distance = (360 - degree) + angle;
+                    range.position = -1;
+                }
             }
             //if left is greater than 360 degrees; out of bounds
         } else if (left > 360) {
@@ -399,6 +375,10 @@ public class DriveBase {
                 range.position = 0;
             } else {
                 range.position = -1;
+                if(range.distance > 180) {
+                    range.distance = degree + (360 - angle);
+                    range.position = 1;
+                }
             }
             //normal conditions: if degree is greater than left, set position to 1
             //else, if degree is less than right, set position to -1
@@ -424,6 +404,11 @@ public class DriveBase {
                 range.position = -1;
             }
         }
+
+        opMode.telemetry.addData("degree", degree);
+        opMode.telemetry.addData("angle", angle);
+        opMode.telemetry.addData("range.distance = ", range.distance);
+
         return range;
     }
 
@@ -446,7 +431,7 @@ public class DriveBase {
         boolean forceLowPower = false;
 
         while (opMode.opModeIsActive()) {
-
+            opMode.telemetry.addData("power: ", powerlevel);
             //update rangeresult
             rangeresult = inRange(angle, angleoffset);
             position = rangeresult.position;
@@ -456,12 +441,12 @@ public class DriveBase {
             if (distance > 45) {
                 powerlevel = 0.5;
             } else {
-                powerlevel = 0.28;
-                forceLowPower=true;
+                powerlevel = 0.23;
+                forceLowPower = true;
             }
 
             if (forceLowPower) {
-                powerlevel = 0.28;
+                powerlevel = 0.23;
             }
 
             //turn or stop
