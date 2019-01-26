@@ -33,6 +33,7 @@ import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 
+import com.disnodeteam.dogecv.detectors.roverrukus.SilverDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -43,6 +44,7 @@ public class GoldMineralDetectorTest extends OpMode
 {
     // Detector object
     private GoldDetector goldD;
+    private SilverDetector silverD;
 
 
     @Override
@@ -64,6 +66,19 @@ public class GoldMineralDetectorTest extends OpMode
             goldD.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
 
             goldD.enable(); // Start the detector!
+
+        //SILVER MINERAL
+            silverD = new SilverDetector();
+            silverD.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
+            silverD.useDefaults();
+
+            //optional tuning
+            silverD.downscale = 0.4;
+            silverD.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
+            silverD.maxAreaScorer.weight = 0.005;
+            silverD.ratioScorer.weight = 0.5;
+            silverD.ratioScorer.perfectRatio = 1.0;
+            //silverD.enable();
 
 
     }
@@ -89,8 +104,16 @@ public class GoldMineralDetectorTest extends OpMode
      */
     @Override
     public void loop() {
-        telemetry.addData("Gold X Position" , goldD.getScreenPosition().x); // Gold X position.
-        telemetry.addData("found cube",goldD.getFoundRect());
+        telemetry.addData("GOLD X Position: " , goldD.getScreenPosition().x);
+        telemetry.addData("GOLD FOUND: ",goldD.isFound());
+        telemetry.addData("GOLD SIZE", goldD.getInitSize());
+
+        telemetry.addData("SILVER X Position: " , silverD.getScreenPosition().x);
+        telemetry.addData("SILVER FOUND: ",silverD.getFoundRect());
+        telemetry.addData("SILVER SIZE", silverD.isFound());
+
+
+
     }
 
     /*
@@ -100,6 +123,7 @@ public class GoldMineralDetectorTest extends OpMode
     public void stop() {
         // Disable the detector
         goldD.disable();
+        silverD.disable();
     }
 
 }

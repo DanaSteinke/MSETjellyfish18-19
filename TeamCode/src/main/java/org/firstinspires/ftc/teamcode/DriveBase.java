@@ -55,14 +55,14 @@ public class DriveBase {
 
 
     //Driving Power Functions
-    public void DriveForward(double power) {
+    public void driveForward(double power) {
         frontLeft.setPower(power);
         frontRight.setPower(power);
         backRight.setPower(power);
         backLeft.setPower(power);
     }
 
-    public void DriveBackward(double power) {
+    public void driveBackward(double power) {
         frontLeft.setPower(-power);
         frontRight.setPower(-power);
         backRight.setPower(-power);
@@ -86,11 +86,11 @@ public class DriveBase {
     }
 
     public void StopDriving() {
-        DriveForward(0.0);
+        driveForward(0.0);
     }
 
     //Encoder Functions
-    public void RotateDistance(double power, int distance) {
+    public void rotateRightDistance(double power, int distance) {
 
         //Restart Encoders
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -110,7 +110,7 @@ public class DriveBase {
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        DriveForward(power);
+        rotateRight(power);
 
         while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy()) {
             //wait until target position is reached
@@ -130,11 +130,19 @@ public class DriveBase {
         return result;
     }
 
-    public void strafeLeft(double power, double diff) {
-        double pfl = scaleDiffPower(-power, diff, 1.0);
+    public void compassDrive(double power, double angle) {
+        RangeResult rangeresult = new RangeResult();
+        rangeresult = inRange(angle,5);
+
+        //convert degrees(0-360) to radians(0.0-3.14) to diff(0.0 to 0.1)
+        double diff = (Math.toRadians(rangeresult.distance)/3.14)/10;
+        double position = rangeresult.position;
+        diff = diff * position;
+
+        double pfl = scaleDiffPower(power, diff, 1.0);
         double pbl = scaleDiffPower(power, diff, 1.0);
         double pfr = scaleDiffPower(power, diff, -1.0);
-        double pbr = scaleDiffPower(-power, diff, -1.0);
+        double pbr = scaleDiffPower(power, diff, -1.0);
         safeDrive(pfl, pbl, pfr, pbr);
     }
 
@@ -153,15 +161,11 @@ public class DriveBase {
         if (power > 1.0) {
             power = 1.0;
         }
-        // 0.7 is because AndyMark motors in Encoder mode have less RPMs
-        return 0.7 * power;
+        return power;
     }
 
     public double scaleDiffPower(double power, double diff, double sign) {
-        double p = 0.0;
-        double p2 = power + (sign * diff);
-        // p2 changes the power by absolute amount
-        p = p2;
+        double p = power + (sign * diff);
         return safePower(p);
     }
 
@@ -214,72 +218,8 @@ public class DriveBase {
 
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
-            /*
-            if (rangeResult10.position != 0) {
-
-                v1distance = frontLeft.getTargetPosition() - frontLeft.getCurrentPosition();
-                v2distance = frontRight.getTargetPosition() - frontRight.getCurrentPosition();
-                v3distance = backLeft.getTargetPosition() - backLeft.getCurrentPosition();
-                v4distance = backRight.getTargetPosition() - backRight.getCurrentPosition();
-
-//                frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-                frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
-                gyroToGo(directionalAngle, 10);
-
-
-                frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-                frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                frontLeft.setTargetPosition(v1distance);
-                frontRight.setTargetPosition(v2distance);
-                backLeft.setTargetPosition(v3distance);
-                backRight.setTargetPosition(v4distance);
-
-                frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                */
-
-                /*
-                try{
-                   gyroToGo(directionalAngle, 10);
-                }
-                catch(InterruptedException ex){
-                    System.out.print(ex.getMessage());
-                }
-
-
-            }
-
-            frontLeft.setPower(v1);
-            frontRight.setPower(v2);
-            backLeft.setPower(v3);
-            backRight.setPower(v4);
-
-
-            rangeResult10 = inRange(directionalAngle, 10);
-            */
-
-
-            opMode.telemetry.update();
             opMode.telemetry.addData("v1", v1);
             opMode.telemetry.addData("v2", v2);
             opMode.telemetry.addData("v3", v3);
@@ -441,12 +381,12 @@ public class DriveBase {
             if (distance > 45) {
                 powerlevel = 0.5;
             } else {
-                powerlevel = 0.23;
+                powerlevel = 0.25;
                 forceLowPower = true;
             }
 
             if (forceLowPower) {
-                powerlevel = 0.23;
+                powerlevel = 0.25;
             }
 
             //turn or stop

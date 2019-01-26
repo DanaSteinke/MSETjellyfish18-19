@@ -134,12 +134,8 @@ public class SamplingOrderDetector extends DogeCVDetector {
         }
 
         // Prepare to find best white (silver) results
-        List<Rect>   choosenWhiteRect  = new ArrayList<>(2);
-        List<Double> chosenWhiteScore  = new ArrayList<>(2);
-        chosenWhiteScore.add(0, Double.MAX_VALUE);
-        chosenWhiteScore.add(1, Double.MAX_VALUE);
-        choosenWhiteRect.add(0, null);
-        choosenWhiteRect.add(1, null);
+        Rect   chosenWhiteRect  = null;
+        double chosenWhiteScore = Integer.MAX_VALUE;
 
 
         for(MatOfPoint c : contoursWhite){
@@ -172,13 +168,9 @@ public class SamplingOrderDetector extends DogeCVDetector {
             boolean good = true;
             if(diffrenceScore < maxDifference && area > 1000){
 
-                if(diffrenceScore < chosenWhiteScore.get(0)){
-                    choosenWhiteRect.set(0,rect);
-                    chosenWhiteScore.set(0,diffrenceScore);
-                }
-                else if(diffrenceScore < chosenWhiteScore.get(1) && diffrenceScore > chosenWhiteScore.get(0)){
-                    choosenWhiteRect.set(1,rect);
-                    chosenWhiteScore.set(1, diffrenceScore);
+                if(diffrenceScore < chosenWhiteScore){
+                    chosenWhiteRect = rect;
+                    chosenWhiteScore = diffrenceScore;
                 }
             }
 
@@ -202,10 +194,9 @@ public class SamplingOrderDetector extends DogeCVDetector {
 
         }
         //Draw found white elements
-        for(int i=0;i<choosenWhiteRect.size();i++){
-            Rect rect = choosenWhiteRect.get(i);
+            Rect rect = chosenWhiteRect;
             if(rect != null){
-                double score = chosenWhiteScore.get(i);
+                double score = chosenWhiteScore;
                 Imgproc.rectangle(displayMat,
                         new Point(rect.x, rect.y),
                         new Point(rect.x + rect.width, rect.y + rect.height),
@@ -220,32 +211,21 @@ public class SamplingOrderDetector extends DogeCVDetector {
             }
 
 
-        }
 
         // If enough elements are found, compute gold position
-        if(choosenWhiteRect.get(0) != null && choosenWhiteRect.get(1) != null  && chosenYellowRect != null){
-            int leftCount = 0;
-            for(int i=0;i<choosenWhiteRect.size();i++){
-                Rect rect = choosenWhiteRect.get(i);
-                if(chosenYellowRect.x > rect.x){
-                    leftCount++;
-                }
-            }
-            if(leftCount == 0){
-                currentOrder = SamplingOrderDetector.GoldLocation.LEFT;
-            }
-
-            if(leftCount == 1){
-                currentOrder = SamplingOrderDetector.GoldLocation.CENTER;
-            }
-
-            if(leftCount >= 2){
+        if(chosenYellowRect == null && chosenWhiteRect != null) {
+            currentOrder = SamplingOrderDetector.GoldLocation.LEFT;
+            isFound = true;
+            lastOrder = currentOrder;
+        } else if(chosenWhiteRect != null && chosenYellowRect != null){
+            if(chosenYellowRect.x > chosenWhiteRect.x) {
                 currentOrder = SamplingOrderDetector.GoldLocation.RIGHT;
+            } else{
+                currentOrder = SamplingOrderDetector.GoldLocation.CENTER;
             }
             isFound = true;
             lastOrder = currentOrder;
-
-        }else{
+        } else{
             currentOrder = SamplingOrderDetector.GoldLocation.UNKNOWN;
             isFound = false;
         }

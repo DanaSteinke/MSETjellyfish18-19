@@ -4,8 +4,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 /**
  * Created by Feranno on 9/29/18.
  */
@@ -13,23 +11,29 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Auto extends LinearOpMode {
     Robot robot;
 
+
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(this);
         robot.driveBase.composeTelemetry();
         robot.markerDispenser.setPosition(0.55);
+        robot.samplingOrder.enable();
+
 
         waitForStart();
         robot.driveBase.setHeadingToZero();
 
-        //Start Auto
-        //test gyros
-        robot.driveBase.gyroToGo(270);
+        //start auto
+
+        //DETERMINE GOLD MINERAL LOCATION
+        telemetry.addData("GOLD LOCATION: ", robot.samplingOrder.getGoldLocation());
+        telemetry.update();
         sleep(1000);
-        robot.driveBase.gyroToGo(0);
-        sleep(1000);
-        robot.driveBase.gyroToGo(60);
-        sleep(1000);
-        robot.driveBase.gyroToGo(0);
+
+        robot.samplingOrder.disable();
+        robot.driveBase.VectorDistance(0.3,1000,0);
+
     }
 }
