@@ -130,7 +130,7 @@ public class DriveBase {
         return result;
     }
 
-    public void compassDrive(double power, double angle) {
+    public void compassDrive(double fl, double bl, double fr, double br, double angle) {
         RangeResult rangeresult = new RangeResult();
         rangeresult = inRange(angle,5);
 
@@ -139,10 +139,10 @@ public class DriveBase {
         double position = rangeresult.position;
         diff = diff * position;
 
-        double pfl = scaleDiffPower(power, diff, 1.0);
-        double pbl = scaleDiffPower(power, diff, 1.0);
-        double pfr = scaleDiffPower(power, diff, -1.0);
-        double pbr = scaleDiffPower(power, diff, -1.0);
+        double pfl = scaleDiffPower(fl, diff, 1.0);
+        double pbl = scaleDiffPower(bl, diff, 1.0);
+        double pfr = scaleDiffPower(fr, diff, -1.0);
+        double pbr = scaleDiffPower(br, diff, -1.0);
         safeDrive(pfl, pbl, pfr, pbr);
     }
 
@@ -175,6 +175,8 @@ public class DriveBase {
     void VectorDistance(double power, int distance, double directionalAngle) throws InterruptedException {
         //match gyro direction
         directionalAngle += 90;
+        directionalAngle = directionalAngle % 360;
+
         //multiplier
         double m = 1;
         double r = power;
@@ -213,12 +215,10 @@ public class DriveBase {
 
 
         //correcting for Vector Distance with gyro
-        //RangeResult rangeResult10 = inRange(directionalAngle, 10);
-        //int v1distance, v2distance, v3distance, v4distance;
+
 
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
-
 
             opMode.telemetry.addData("v1", v1);
             opMode.telemetry.addData("v2", v2);
@@ -234,6 +234,64 @@ public class DriveBase {
             opMode.telemetry.addData("frontRightE:", frontRight.getCurrentPosition());
             opMode.telemetry.addData("backLeftE:", backLeft.getCurrentPosition());
             opMode.telemetry.addData("backRightE:", backRight.getCurrentPosition());
+
+        }
+
+        StopDriving();
+        opMode.sleep(300);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    void CompassVectorDistance(double power, int distance, double directionalAngle) throws InterruptedException {
+        //match gyro direction
+        directionalAngle += 90;
+        directionalAngle = directionalAngle % 360;
+        //multiplier
+        double m = 1;
+        double r = power;
+        double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
+        //calculate voltage for each motor
+        double v1 = m * r * Math.cos(robotAngle);
+        double v2 = m * r * Math.sin(robotAngle);
+        double v3 = m * r * Math.sin(robotAngle);
+        double v4 = m * r * Math.cos(robotAngle);
+        //safe power
+
+        //reset encoders
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //check that motor(frontLeft,backLeft,frontRight,backRight) corresponds with voltage and unique motor distance
+        //MOTOR ORDER MATTERS
+        //ex: frontLeft=>v1 and d1
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + (distance * positiveNegative(v1)));
+        frontRight.setTargetPosition(frontRight.getCurrentPosition() + (distance * positiveNegative(v2)));
+        backLeft.setTargetPosition(backLeft.getCurrentPosition() + (distance * positiveNegative(v3)));
+        backRight.setTargetPosition(backRight.getCurrentPosition() + (distance * positiveNegative(v4)));
+
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        compassDrive(v1, v2, v3, v4, directionalAngle);
+
+        //correcting for Vector Distance with gyro
+        while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+            //wait until robot stops
+            compassDrive(v1, v2, v3, v4, directionalAngle);
+
+            opMode.telemetry.addData("flp:", frontLeft.getPower());
+            opMode.telemetry.addData("blp:", frontRight.getPower());
+            opMode.telemetry.addData("frp:", backLeft.getPower());
+            opMode.telemetry.addData("brp:", backRight.getPower());
+
 
         }
 

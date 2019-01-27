@@ -30,10 +30,15 @@ public class Auto extends LinearOpMode {
         //DETERMINE GOLD MINERAL LOCATION
         telemetry.addData("GOLD LOCATION: ", robot.samplingOrder.getGoldLocation());
         telemetry.update();
-        sleep(1000);
 
         robot.samplingOrder.disable();
-        robot.driveBase.VectorDistance(0.3,1000,0);
+
+        robot.Lift.ExtendingLift();
+
+        /*
+        robot.driveBase.VectorDistance(1,7000,0);
+        robot.driveBase.CompassVectorDistance(1, 7000, 180);
+        */
 
     }
 }

@@ -35,7 +35,6 @@ public class GoldAlign {
         goldD.ratioScorer.weight = 5;
         goldD.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
         goldD.enable();
-
     }
 
     public void disable() throws InterruptedException{
@@ -48,6 +47,9 @@ public class GoldAlign {
     }
     public double getGoldXPosition() throws InterruptedException{
         return goldD.getXPosition();
+    }
+    public boolean getAligned(){
+        return goldD.getAligned();
     }
 
 }
