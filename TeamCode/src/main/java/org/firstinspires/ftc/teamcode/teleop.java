@@ -19,8 +19,7 @@ public class teleop extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            //GAMEPAD 1
-            //intake.setPower(-gamepad2.right_stick_y);
+         //GAMEPAD 1
             //Gamepad 1 Drive Train Controller
             //field centric drive
             //because of joystick positions, change yValue to reverse, then Quadrants will be in position
@@ -53,6 +52,7 @@ public class teleop extends LinearOpMode {
                 robot.driveBase.backLeft.setPower(v3);
                 robot.driveBase.backRight.setPower(v4);
             }
+            /*
             telemetry.update();
             telemetry.addData("v1", v1);
             telemetry.addData("v2", v2);
@@ -63,28 +63,25 @@ public class teleop extends LinearOpMode {
             telemetry.addData("backLeft: ", robot.driveBase.backLeft.getPower());
             telemetry.addData("frontRight: ", robot.driveBase.frontRight.getPower());
             telemetry.addData("backRight: ", robot.driveBase.backRight);
+            */
 
-            //GAMEPAD 2
-            //lift with limit
+         //GAMEPAD 2
+            //lift with limits
             if (gamepad2.y && !robot.Lift.topLimit.isPressed()) {
                 //while y button is pressed and top limit is not pressed, extend lift
-                robot.Lift.lift.setPower(-1);
-            } else if (gamepad2.x && !robot.Lift.topLimit.isPressed()) {
                 robot.Lift.lift.setPower(1);
-            } else if (gamepad2.x == false || gamepad2.y == false) {
-                if (gamepad2.dpad_down == true) {
-                    robot.Lift.lift.setPower(-1);
-                } else if (gamepad2.dpad_up == true) {
-                    robot.Lift.lift.setPower(1);
-                } else {
-                    robot.Lift.lift.setPower(0);
-                    robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                }
+            } else if (gamepad2.x && !robot.Lift.botLimit.isPressed()) {
+                robot.Lift.lift.setPower(-1);
+            } else {
+                robot.Lift.lift.setPower(0);
+                robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
 
-
-            //intake pivot
+            //intake system
             robot.intakePivot.setPower(gamepad2.left_stick_y * 0.75);
+            if(robot.intakePivot.getPower() == 0.0){
+                robot.intakePivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
 
             //intake
             if (gamepad2.a == true) {
@@ -99,17 +96,21 @@ public class teleop extends LinearOpMode {
             if (gamepad2.dpad_left == true) {
                 robot.elevator.setPower(0.8);
             } else if (gamepad2.dpad_right) {
-                robot.elevator.setPower(-0.4);
+                robot.elevator.setPower(-1);
             } else {
                 robot.elevator.setPower(0.0);
-                robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
-            //Stationary
+            //outake
+            robot.outake.setPosition(gamepad2.right_trigger);
+
+            telemetry.addData("outake", robot.outake.getPosition());
+            telemetry.addData("gamepad2.right_stick_y", gamepad2.right_stick_y);
+            telemetry.update();
+
+         //Stationary
             // marker dispenser
             robot.markerDispenser.setPosition(0.55);
-
-
-
 
         }
     }

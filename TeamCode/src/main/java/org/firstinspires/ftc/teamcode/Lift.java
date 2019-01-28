@@ -14,6 +14,7 @@ public class Lift {
     LinearOpMode opMode;
 
     public DcMotor lift;
+    public TouchSensor botLimit;
     public TouchSensor topLimit;
 
     public Lift(LinearOpMode opMode) throws InterruptedException {
@@ -21,7 +22,8 @@ public class Lift {
 
         //initialize motors
         lift = opMode.hardwareMap.dcMotor.get("lift");
-        topLimit= opMode.hardwareMap.touchSensor.get("topLimit");
+        botLimit= opMode.hardwareMap.touchSensor.get("botLimit");
+        topLimit = opMode.hardwareMap.touchSensor.get("topLimit");
 
 
     }
@@ -64,10 +66,9 @@ public class Lift {
 
     //MAGNETIC LIMIT SWITCH(TOUCH SENSOR)
     public void DetractLift() throws InterruptedException{
-        TimedExtendLift(-1,500);
 
-        while(!topLimit.isPressed() && opMode.opModeIsActive()){
-            //if top limit switch is not pressed, go up
+        while(!botLimit.isPressed() && opMode.opModeIsActive()){
+            //if bot limit switch is not pressed, go down
             lift.setPower(-1);
 
         }
@@ -75,7 +76,6 @@ public class Lift {
         opMode.sleep(100);
     }
     public void ExtendingLift() throws InterruptedException{
-        TimedExtendLift(1,500);
         while(!topLimit.isPressed() && opMode.opModeIsActive()){
             //if top limit switch is not pressed, go up
             lift.setPower(1);

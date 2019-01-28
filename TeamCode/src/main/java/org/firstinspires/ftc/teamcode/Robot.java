@@ -14,6 +14,7 @@ public class Robot {
     public DcMotor intakePivot;
     public DcMotor intake;
     public DcMotor elevator;
+    public Servo outake;
 
     public GoldAlign goldAlign;
     public SamplingOrder samplingOrder;
@@ -29,11 +30,12 @@ public class Robot {
         intakePivot = opMode.hardwareMap.dcMotor.get("intakePivot");
         intake = opMode.hardwareMap.dcMotor.get("intake");
         elevator = opMode.hardwareMap.dcMotor.get("elevator");
+        outake = opMode.hardwareMap.servo.get("outake");
 
     }
 
-    public void driveGoldAlign(){
-        driveBase.driveForward(0.3);
+    public void goldAlignDistance(){
+
     }
 
 

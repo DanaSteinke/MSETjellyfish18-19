@@ -19,7 +19,7 @@ public class Auto extends LinearOpMode {
         robot = new Robot(this);
         robot.driveBase.composeTelemetry();
         robot.markerDispenser.setPosition(0.55);
-        robot.samplingOrder.enable();
+        //robot.samplingOrder.enable();
 
 
         waitForStart();
@@ -28,17 +28,16 @@ public class Auto extends LinearOpMode {
         //start auto
 
         //DETERMINE GOLD MINERAL LOCATION
+        /*
         telemetry.addData("GOLD LOCATION: ", robot.samplingOrder.getGoldLocation());
         telemetry.update();
-
         robot.samplingOrder.disable();
-
-        robot.Lift.ExtendingLift();
-
-        /*
-        robot.driveBase.VectorDistance(1,7000,0);
-        robot.driveBase.CompassVectorDistance(1, 7000, 180);
         */
+
+
+        //testing Compass VectorDistance
+        robot.driveBase.VectorDistance(1, 5000, 0);
+        robot.driveBase.CompassVectorDistance(1, 5000, 180);
 
     }
 }
