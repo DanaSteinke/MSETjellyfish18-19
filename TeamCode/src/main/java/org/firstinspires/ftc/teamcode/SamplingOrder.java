@@ -36,19 +36,19 @@ public class SamplingOrder{
         //detector.perfectAreaScorer.perfectArea = 10000; // if using PERFECT_AREA scoring
         detector.maxAreaScorer.weight = 0.001;
 
-        detector.ratioScorer.weight = 15;
+        detector.ratioScorer.weight = 5;
         detector.ratioScorer.perfectRatio = 1.0;
         detector.enable(); // Start detector
     }
 
-    public String getGoldLocation(){
+    public String getGoldLocation() throws InterruptedException{
         String result = "UNKNOWN";
         int leftcount = 0;
         int centercount = 0;
         int rightcount = 0;
         String goldLocation;
 
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 20; i++){
             goldLocation = detector.getCurrentOrder().toString();
             if(goldLocation == "LEFT"){
                 leftcount++;

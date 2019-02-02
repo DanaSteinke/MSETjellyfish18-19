@@ -1,14 +1,17 @@
+
+
 package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+
 /**
  * Created by Feranno on 9/29/18.
  */
-@Autonomous(name = "Auto")
-public class Auto extends LinearOpMode {
+@Autonomous(name = "AutoCrater")
+public class AutoCrater extends LinearOpMode {
     Robot robot;
 
     @Override
@@ -39,8 +42,7 @@ public class Auto extends LinearOpMode {
         robot.driveBase.CompassVectorDistance(1,8000, 0,40);
 
         robot.Lift.DetractLift();
-
-
-
     }
 }
+
+

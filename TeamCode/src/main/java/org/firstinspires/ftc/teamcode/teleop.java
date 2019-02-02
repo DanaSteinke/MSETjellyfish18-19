@@ -52,6 +52,15 @@ public class teleop extends LinearOpMode {
                 robot.driveBase.backLeft.setPower(v3);
                 robot.driveBase.backRight.setPower(v4);
             }
+
+            //intake
+            if (gamepad1.left_bumper == true) {
+                robot.intake.setPower(0.7);
+            } else if (gamepad1.right_bumper == true) {
+                robot.intake.setPower(-0.7);
+            } else {
+                robot.intake.setPower(0.0);
+            }
             /*
             telemetry.update();
             telemetry.addData("v1", v1);
@@ -83,18 +92,9 @@ public class teleop extends LinearOpMode {
                 robot.intakePivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
 
-            //intake
-            if (gamepad2.a == true) {
-                robot.intake.setPower(1);
-            } else if (gamepad2.b == true) {
-                robot.intake.setPower(-1);
-            } else {
-                robot.intake.setPower(0.0);
-            }
-
             //elevator
             if (gamepad2.dpad_left == true) {
-                robot.elevator.setPower(0.8);
+                robot.elevator.setPower(0.4);
             } else if (gamepad2.dpad_right) {
                 robot.elevator.setPower(-1);
             } else {
@@ -102,7 +102,7 @@ public class teleop extends LinearOpMode {
                 robot.Lift.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
             //outake
-            robot.outake.setPosition(gamepad2.right_trigger);
+            robot.outake.setPosition(gamepad2.right_trigger*0.75);
 
             telemetry.addData("outake", robot.outake.getPosition());
             telemetry.addData("gamepad2.right_stick_y", gamepad2.right_stick_y);
@@ -114,10 +114,5 @@ public class teleop extends LinearOpMode {
 
         }
     }
-    /*
-    public void init(HardwareMap ahwMap){
-        this.hwMap = ahwMap;
-        //intake = this.hwMap.crservo.get("intake");
-    }
-    */
+
 }

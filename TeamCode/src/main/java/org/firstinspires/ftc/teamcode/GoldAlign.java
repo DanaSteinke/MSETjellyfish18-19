@@ -48,7 +48,7 @@ public class GoldAlign {
     public double getGoldXPosition() throws InterruptedException{
         return goldD.getXPosition();
     }
-    public boolean getAligned(){
+    public boolean getAligned() throws InterruptedException{
         return goldD.getAligned();
     }
 

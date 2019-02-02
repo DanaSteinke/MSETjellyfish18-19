@@ -89,6 +89,25 @@ public class DriveBase {
         driveForward(0.0);
     }
 
+    public void compassVectorDrive(double power, double directionalAngle) throws InterruptedException{
+        //match gyro direction
+        directionalAngle += 90;
+        directionalAngle = directionalAngle % 360;
+        double gyroAngle = 0;
+
+        //multiplier
+        double m = 1;
+        double r = power;
+        double robotAngle = Math.toRadians(directionalAngle) - Math.PI / 4;
+        //calculate voltage for each motor
+        double v1 = m * r * Math.cos(robotAngle);
+        double v2 = m * r * Math.sin(robotAngle);
+        double v3 = m * r * Math.sin(robotAngle);
+        double v4 = m * r * Math.cos(robotAngle);
+
+        compassDrive(v1, v2, v3, v4, gyroAngle);
+    }
+
     //Encoder Functions
     public void rotateRightDistance(double power, int distance) {
 
@@ -130,23 +149,24 @@ public class DriveBase {
         return result;
     }
 
-    public void compassDrive(double fl, double bl, double fr, double br, double angle) {
+    public void compassDrive(double fl, double bl, double fr, double br, double angle) throws InterruptedException{
         RangeResult rangeresult = new RangeResult();
-        rangeresult = inRange(angle,5);
+        rangeresult = inRange(angle,1.5);
 
         //convert degrees(0-360) to radians(0.0-3.14) to diff(0.0 to 0.1)
-        double diff = (Math.toRadians(rangeresult.distance)/3.14)/10;
+        double diff = (Math.toRadians(rangeresult.distance)/3.14);
         double position = rangeresult.position;
-        diff = diff * position;
+        diff = 2 * diff * position;
+        opMode.telemetry.addData("diff", diff);
 
-        double pfl = scaleDiffPower(fl, diff, 1.0);
-        double pbl = scaleDiffPower(bl, diff, 1.0);
-        double pfr = scaleDiffPower(fr, diff, -1.0);
-        double pbr = scaleDiffPower(br, diff, -1.0);
+        double pfl = scaleDiffPower(fl, diff, -1.0);
+        double pbl = scaleDiffPower(bl, diff, -1.0);
+        double pfr = scaleDiffPower(fr, diff, 1.0);
+        double pbr = scaleDiffPower(br, diff, 1.0);
         safeDrive(pfl, pbl, pfr, pbr);
     }
 
-    public void safeDrive(double pfl, double pbl, double pfr, double pbr) {
+    public void safeDrive(double pfl, double pbl, double pfr, double pbr) throws InterruptedException{
         // Stagger the order to reduce left/right front/back bias at start
         frontLeft.setPower(safePower(pfl));
         backRight.setPower(safePower(pbr));
@@ -154,7 +174,7 @@ public class DriveBase {
         frontRight.setPower(safePower(pfr));
     }
 
-    public double safePower(double power) {
+    public double safePower(double power) throws  InterruptedException{
         if (power < -1.0) {
             power = -1.0;
         }
@@ -164,7 +184,7 @@ public class DriveBase {
         return power;
     }
 
-    public double scaleDiffPower(double power, double diff, double sign) {
+    public double scaleDiffPower(double power, double diff, double sign) throws InterruptedException{
         double p = power + (sign * diff);
         return safePower(p);
     }
@@ -186,7 +206,6 @@ public class DriveBase {
         double v2 = m * r * Math.sin(robotAngle);
         double v3 = m * r * Math.sin(robotAngle);
         double v4 = m * r * Math.cos(robotAngle);
-        //safe power
 
         //reset encoders
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -213,10 +232,6 @@ public class DriveBase {
         backLeft.setPower(v3);
         backRight.setPower(v4);
 
-
-        //correcting for Vector Distance with gyro
-
-
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
 
@@ -234,21 +249,23 @@ public class DriveBase {
             opMode.telemetry.addData("frontRightE:", frontRight.getCurrentPosition());
             opMode.telemetry.addData("backLeftE:", backLeft.getCurrentPosition());
             opMode.telemetry.addData("backRightE:", backRight.getCurrentPosition());
-
+            opMode.telemetry.update();
         }
 
         StopDriving();
-        opMode.sleep(300);
+        //opMode.sleep(300);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    void CompassVectorDistance(double power, int distance, double directionalAngle) throws InterruptedException {
+
+    void CompassVectorDistance(double power, int distance, double directionalAngle, double gyroAngle) throws InterruptedException {
         //match gyro direction
         directionalAngle += 90;
         directionalAngle = directionalAngle % 360;
+
         //multiplier
         double m = 1;
         double r = power;
@@ -280,12 +297,12 @@ public class DriveBase {
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        compassDrive(v1, v2, v3, v4, directionalAngle);
+        compassDrive(v1, v2, v3, v4, gyroAngle);
 
         //correcting for Vector Distance with gyro
         while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
             //wait until robot stops
-            compassDrive(v1, v2, v3, v4, directionalAngle);
+            compassDrive(v1, v2, v3, v4, gyroAngle);
 
             opMode.telemetry.addData("flp:", frontLeft.getPower());
             opMode.telemetry.addData("blp:", frontRight.getPower());
@@ -296,7 +313,7 @@ public class DriveBase {
         }
 
         StopDriving();
-        opMode.sleep(300);
+        //opMode.sleep(300);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -439,12 +456,12 @@ public class DriveBase {
             if (distance > 45) {
                 powerlevel = 0.5;
             } else {
-                powerlevel = 0.25;
+                powerlevel = 0.22;
                 forceLowPower = true;
             }
 
             if (forceLowPower) {
-                powerlevel = 0.25;
+                powerlevel = 0.22;
             }
 
             //turn or stop
@@ -453,7 +470,7 @@ public class DriveBase {
                 waitUntilStable();
                 rangeresult = inRange(angle, angleoffset);
                 if (rangeresult.position == 0) {
-                    opMode.sleep(300);
+                    //opMode.sleep(300);
                     break;
                 }
                 //position is left of heading, rotate right

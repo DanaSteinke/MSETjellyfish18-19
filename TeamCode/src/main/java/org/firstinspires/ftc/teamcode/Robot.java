@@ -34,8 +34,18 @@ public class Robot {
 
     }
 
-    public void goldAlignDistance(){
-
+    public void goldAlignDistance(double angle) throws InterruptedException{
+        goldAlign.enable();
+        /*
+        while(goldAlign.isFound() == false){
+            driveBase.compassVectorDrive(0.5, angle);
+        }
+        */
+        while(goldAlign.getAligned() == false) {
+            driveBase.compassVectorDrive(0.3, angle);
+        }
+        driveBase.StopDriving();
+        goldAlign.disable();
     }
 
 

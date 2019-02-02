@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 /**
  * Created by Feranno on 9/29/18.
  */
-@Autonomous(name = "AutoBlueMarker")
-public class AutoBlueMarker extends LinearOpMode {
+@Autonomous(name = "AutoMarker")
+public class AutoMarker extends LinearOpMode {
     Robot robot;
 
     @Override
@@ -24,24 +24,20 @@ public class AutoBlueMarker extends LinearOpMode {
         //Start Auto
         //extend lift
         robot.Lift.ExtendingLift();
+        robot.driveBase.CompassVectorDistance(1, 200, 90,0);
+        robot.driveBase.CompassVectorDistance(1, 300, 0,0);
+        robot.driveBase.CompassVectorDistance(1, 200, 270,0);
+        robot.driveBase.CompassVectorDistance(1, 300, 90, 0);
 
-        //turn to prep position after extending lift
-        robot.driveBase.VectorDistance(0.5, 500, 180);
-        robot.driveBase.VectorDistance(1, 200, 270);
-        robot.driveBase.VectorDistance(1, 300, 90);
-        robot.driveBase.gyroToGo(320);
-
-        //drive to the marker depot
-        robot.driveBase.VectorDistance(1, 3350, 180);
-        robot.driveBase.gyroToGo(227, 4);
-        robot.driveBase.VectorDistance(1, 3300, 180);
-
-        //dispense marker and drive to crater
+        robot.driveBase.gyroToGo(270);
+        robot.driveBase.CompassVectorDistance(1, 5000, 180,270);
         robot.markerDispenser.setPosition(0);
-        sleep(700);
+        sleep(500);
         robot.markerDispenser.setPosition(0.55);
-        sleep(700);
-        robot.driveBase.VectorDistance(1, 6800, 0);
+        sleep(500);
+        robot.driveBase.gyroToGo(210);
+        robot.driveBase.CompassVectorDistance(1, 8000, 0, 220);
+
         robot.Lift.DetractLift();
 
     }
